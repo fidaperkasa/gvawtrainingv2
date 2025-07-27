@@ -17,6 +17,26 @@ Place mark label in F10 Map then the format as follow:
 >>  Template:    spawn,temp=TEMPLATE_NAME,country=C,hdg=DEG
 
 
+### List of Template:
+SAM
+- SA-10SAMIR
+- Heavy Searchlight
+- SA-2SAMIR
+- RapierSAMIR
+- NASAMSNOR
+- NASAMSFIN
+- NASAMSCJTFBLUE
+- NASAMSCJTFRED
+- NASAMSUSA
+- FLAK18BATT
+- HawkSAMReinf
+- FLAK36BAT
+- SKORPIONFreya
+- RapierSAMUK
+- PatriotSAMNL
+- BRITISHBOFORSAABAT
+- SA-11SAM
+
 
 ### List of Unit can be spawn:
  GROUND_UNIT
