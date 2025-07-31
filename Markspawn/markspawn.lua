@@ -2,7 +2,7 @@
 --
 -- GVAW MarkSpawn Enhanched - Universal Spawning Script for DCS World
 -- By EagleEye - DCS Indonesia
--- Version 3.0.1 - Integrated Template Spawning (Code Cleanup)
+-- Version 3.0.2 - Corrected for private user notifications
 --
 -- =================================================================================================
 --[[
@@ -39,7 +39,7 @@ markspawn.dbFileName = "dbspawn.json"
 markspawn.spawnedGroups = {} -- Tracks all spawned groups by name
 
 -- Load external libraries
-JSON = dofile(lfs.writedir() .. [[Scripts\json.lua]])
+JSON = dofile(lfs.writedir() .. [[Scripts\GVAWv2\json.lua]])
 if not JSON then
     trigger.action.outText("CRITICAL ERROR: json.lua not found. Please ensure it is in your Scripts folder.", 30)
     return
@@ -51,7 +51,7 @@ end
 markspawn.unitDatabase = {}
 
 function markspawn.loadDatabase()
-    local dbPath = lfs.writedir() .. [[Scripts\]] .. markspawn.dbFileName
+    local dbPath = lfs.writedir() .. [[Scripts\GVAWv2\]] .. markspawn.dbFileName
     local file = io.open(dbPath, "r")
     if file then
         local contents = file:read("*a")
@@ -67,7 +67,6 @@ end
 ---------------------------------------------------------------------------------------------------
 function string.startsWith(String, Start) return string.sub(String, 1, string.len(Start)) == Start end
 
---- MODIFIED --- Use a more flexible regex to allow spaces in template names
 function markspawn.getMessageParameters(message)
     local params = {}
     for key, value in string.gmatch(message, "([^=,]+)=([^,]+)") do
@@ -75,10 +74,21 @@ function markspawn.getMessageParameters(message)
     end
     return params
 end
-function markspawn.notify(message, timeout) if not timeout then timeout = 10 end; trigger.action.outText("[MarkSpawn] " .. message, timeout) end
+
+-- Sends message to a specific unit if unitId is provided.
+-- Falls back to global message for F10 menu items that don't provide an initiator.
+function markspawn.notify(message, timeout, unitId)
+    timeout = timeout or 10
+    local text = "[MarkSpawn] " .. message
+    if unitId then
+        trigger.action.outTextForUnit(unitId, text, timeout, false)
+    else
+        trigger.action.outText(text, timeout)
+    end
+end
+
 function markspawn.log(message) if markspawn.debug then print("MARKSPAWN DEBUG: " .. message) end end
 
---- MODIFIED --- Ignores the "TEMPLATES" category when searching for unit types
 function markspawn.getUnitCategory(unitTypeName)
     for category, unitList in pairs(markspawn.unitDatabase) do
         if category ~= "TEMPLATES" then
@@ -165,7 +175,6 @@ function markspawn.menu.updateDeleteMenu()
     markspawn.setupF10Menu()
 end
 
---- MODIFIED --- Updated F10 menu to include template spawning info and lists.
 function markspawn.setupF10Menu()
     for _, coa in ipairs({coalition.side.BLUE, coalition.side.RED}) do
         local spawnMenu = missionCommands.addSubMenuForCoalition(coa, "MarkSpawn")
@@ -184,18 +193,33 @@ function markspawn.setupF10Menu()
 
         local listMenu = missionCommands.addSubMenuForCoalition(coa, "List Spawnable Items", spawnMenu)
 
-        -- --- ADDED --- Submenu for listing templates
         if markspawn.unitDatabase.TEMPLATES then
-            local templatesMenu = missionCommands.addSubMenuForCoalition(coa, "List Templates", listMenu)
-            local templateNames = {}
-            for name, _ in pairs(markspawn.unitDatabase.TEMPLATES) do table.insert(templateNames, name) end
-            table.sort(templateNames)
-            for _, templateName in ipairs(templateNames) do
-                missionCommands.addCommandForCoalition(coa, templateName, templatesMenu, function()
-                    markspawn.notify("Template Command: temp=" .. templateName, 15)
-                end)
-            end
-        end
+            missionCommands.addCommandForCoalition(coa, "List Templates", listMenu, function()
+                local templateNames = {}
+                for name, _ in pairs(markspawn.unitDatabase.TEMPLATES) do
+                    table.insert(templateNames, name)
+                end
+                table.sort(templateNames)
+        
+                local chunkSize = 20
+                local delay = 5
+                local timeNow = timer.getTime() + 0.1  -- Add 0.1s safety buffer
+        
+                for i = 1, #templateNames, chunkSize do
+                    local chunk = {}
+                    for j = i, math.min(i + chunkSize - 1, #templateNames) do
+                        table.insert(chunk, templateNames[j])
+                    end
+                    local pageNum = math.floor((i - 1) / chunkSize) + 1
+                    local message = string.format("-- Templates Page %d --\n%s", pageNum, table.concat(chunk, "\n"))
+        
+                    timer.scheduleFunction(function()
+                        markspawn.notify(message, 60)
+                        return nil
+                    end, nil, timeNow + ((pageNum - 1) * delay))
+                end
+            end)
+        end        
 
         local sortedCategories = {"PLANE", "HELICOPTER", "GROUND_UNIT", "SHIP", "STATIC", "CARGO"}
         for _, categoryName in ipairs(sortedCategories) do
@@ -203,11 +227,27 @@ function markspawn.setupF10Menu()
             if unitList and #unitList > 0 then
                 missionCommands.addCommandForCoalition(coa, "List " .. categoryName, listMenu, function()
                     table.sort(unitList)
-                    local message = "-- Spawnable " .. categoryName .. " --\n" .. table.concat(unitList, "\n")
-                    markspawn.notify(message, 60)
+                    local chunkSize = 20
+                    local delay = 5
+                    local timeNow = timer.getTime() + 0.1  -- Safety buffer to ensure Page 1 shows
+
+                    for i = 1, #unitList, chunkSize do
+                        local chunk = {}
+                        for j = i, math.min(i + chunkSize - 1, #unitList) do
+                            table.insert(chunk, unitList[j])
+                        end
+                        local pageNum = math.floor((i - 1) / chunkSize) + 1
+                        local message = string.format("-- %s Page %d --\n%s", categoryName, pageNum, table.concat(chunk, "\n"))
+
+                        timer.scheduleFunction(function()
+                            markspawn.notify(message, 60)
+                            return nil
+                        end, nil, timeNow + ((pageNum - 1) * delay))
+                    end
                 end)
             end
         end
+
 
         local cleanUpMenu = missionCommands.addSubMenuForCoalition(coa, "Clean Up Units", spawnMenu)
         missionCommands.addCommandForCoalition(coa, "Delete All Spawned Units", cleanUpMenu, markspawn.menu.deleteAll)
@@ -226,7 +266,7 @@ end
 ---------------------------------------------------------------------------------------------------
 markspawn.tasking = {}
 
-function markspawn.postSpawnSetup(groupName, spawnLocation, params)
+function markspawn.postSpawnSetup(groupName, spawnLocation, params, unitId)
     local newGroup = Group.getByName(groupName)
     if not newGroup or not newGroup:isExist() then return end
     local controller = newGroup:getController()
@@ -237,7 +277,7 @@ function markspawn.postSpawnSetup(groupName, spawnLocation, params)
     if params.freq then
         if unitType == "JTAC" or params.category == Group.Category.AIRPLANE or params.category == Group.Category.HELICOPTER then
             controller:setCommand({id = 'SetFrequency', params = {frequency = tonumber(params.freq) * 1000000, modulation = 0}})
-            markspawn.notify(groupName .. " radio set to " .. params.freq .. " MHz AM.")
+            markspawn.notify(groupName .. " radio set to " .. params.freq .. " MHz AM.", 10, unitId)
         end
     end
 
@@ -245,17 +285,17 @@ function markspawn.postSpawnSetup(groupName, spawnLocation, params)
         local taskTable
         if unitType == "KC-135MPRS" or unitType == "KC-135" or unitType == "KC-130" then
             taskTable = markspawn.tasking.createTankerTask(spawnLocation, params)
-            markspawn.notify("Tasking " .. groupName .. " as TANKER.")
+            markspawn.notify("Tasking " .. groupName .. " as TANKER.", 10, unitId)
             if params.tacan then
                 local channelStr, band = params.tacan:match("(%d+)(%a)")
                 if channelStr and band then
                     controller:setCommand({id = 'ActivateBeacon', params = {type = 4, system = 2, channel = tonumber(channelStr), mode = band:upper(), callsign = "TKR"}})
-                    markspawn.notify(groupName .. " TACAN activated on " .. params.tacan:upper())
+                    markspawn.notify(groupName .. " TACAN activated on " .. params.tacan:upper(), 10, unitId)
                 end
             end
         else
             taskTable = markspawn.tasking.createOrbitTask(spawnLocation, params)
-            markspawn.notify("Tasking " .. groupName .. " to perform race-track orbit.")
+            markspawn.notify("Tasking " .. groupName .. " to perform race-track orbit.", 10, unitId)
         end
         if taskTable then controller:setTask(taskTable) end
     end
@@ -290,30 +330,27 @@ end
 ---------------------------------------------------------------------------------------------------
 markspawn.spawner = {}
 
---- ADDED --- Function to handle spawning of pre-defined templates
-function markspawn.spawner.spawnTemplate(location, params)
+function markspawn.spawner.spawnTemplate(location, params, unitId)
     local templateName = params.temp
-    if not templateName then markspawn.notify("Error: 'temp' parameter is missing."); return end
+    if not templateName then markspawn.notify("Error: 'temp' parameter is missing.", 10, unitId); return end
     
     local templateData = markspawn.unitDatabase.TEMPLATES[templateName]
-    if not templateData then markspawn.notify("Error: Template '" .. templateName .. "' not found in database."); return end
+    if not templateData then markspawn.notify("Error: Template '" .. templateName .. "' not found in database.", 10, unitId); return end
 
     local countryName = params.country
-    if not countryName then markspawn.notify("Error: 'country' parameter is required for templates."); return end
+    if not countryName then markspawn.notify("Error: 'country' parameter is required for templates.", 10, unitId); return end
     local countryID = country.id[countryName]
-    if not countryID then markspawn.notify("Error: Country '" .. countryName .. "' is not valid."); return end
+    if not countryID then markspawn.notify("Error: Country '" .. countryName .. "' is not valid.", 10, unitId); return end
 
     local groupCategory = Group.Category.GROUND -- All templates are assumed to be ground units for now
     local baseHeadingRad = math.rad(tonumber(params.hdg) or 0)
 
     local unitsTable = {}
     for _, unitT in pairs(templateData.units) do
-        -- Calculate the unit's final heading by adding its relative heading to the base heading
         local unitHeadingRad = baseHeadingRad + math.rad(unitT.heading or 0)
         if unitHeadingRad > (2 * math.pi) then unitHeadingRad = unitHeadingRad - (2 * math.pi) end
         if unitHeadingRad < 0 then unitHeadingRad = unitHeadingRad + (2 * math.pi) end
 
-        -- Calculate the unit's final world position using a 2D rotation matrix
         local unitX = location.x + ((unitT.dx or 0) * math.cos(baseHeadingRad) - (unitT.dy or 0) * math.sin(baseHeadingRad))
         local unitZ = location.z + ((unitT.dx or 0) * math.sin(baseHeadingRad) + (unitT.dy or 0) * math.cos(baseHeadingRad))
         
@@ -334,35 +371,33 @@ function markspawn.spawner.spawnTemplate(location, params)
     local result = coalition.addGroup(countryID, groupCategory, newGroup)
     if result then
         local actualGroupName = result:getName()
-        markspawn.notify("Spawned template: " .. actualGroupName)
+        markspawn.notify("Spawned template: " .. actualGroupName, 10, unitId)
         table.insert(markspawn.spawnedGroups, {name = actualGroupName})
         markspawn.menu.updateDeleteMenu()
     else
-        markspawn.notify("Failed to spawn template: " .. templateName)
+        markspawn.notify("Failed to spawn template: " .. templateName, 10, unitId)
     end
 end
 
---- MODIFIED --- This function now acts as a dispatcher.
-function markspawn.spawner.spawnObject(location, params)
-    -- If 'temp' parameter exists, use the template spawner
+function markspawn.spawner.spawnObject(location, params, unitId)
     if params.temp then
-        markspawn.spawner.spawnTemplate(location, params)
+        markspawn.spawner.spawnTemplate(location, params, unitId)
         return
     end
 
-    if not params.type then markspawn.notify("Error: 'type' parameter is missing."); return end
+    if not params.type then markspawn.notify("Error: 'type' parameter is missing.", 10, unitId); return end
     local unitType = params.type
     local unitCategory = markspawn.getUnitCategory(unitType)
-    if not unitCategory then markspawn.notify("Error: Unit type '" .. unitType .. "' not found in database."); return end
+    if not unitCategory then markspawn.notify("Error: Unit type '" .. unitType .. "' not found in database.", 10, unitId); return end
     local countryName = params.country or "USA"
     params.heading = tonumber(params.hdg) or 360
     local headingRad = math.rad(params.heading)
     local countryID = country.id[countryName]
-    if not countryID then markspawn.notify("Error: Country '" .. countryName .. "' is not valid."); countryID = country.id.USA end
+    if not countryID then markspawn.notify("Error: Country '" .. countryName .. "' is not valid.", 10, unitId); countryID = country.id.USA end
     
     if unitCategory == "STATIC" then
         local newStatic = { type = unitType, name = unitType .. "_" .. math.random(1000, 9999), x = location.x, y = location.z, heading = headingRad }
-        if coalition.addStaticObject(countryID, newStatic) then markspawn.notify("Spawned static object: " .. unitType) else markspawn.notify("Failed to spawn static object: " .. unitType) end
+        if coalition.addStaticObject(countryID, newStatic) then markspawn.notify("Spawned static object: " .. unitType, 10, unitId) else markspawn.notify("Failed to spawn static object: " .. unitType, 10, unitId) end
     else
         local groupName = unitType .. "_" .. math.random(1000, 9999)
         local callsignTable
@@ -394,7 +429,6 @@ function markspawn.spawner.spawnObject(location, params)
                 unitData.alt = groundY + (tonumber(params.alt) or (unitCategory == Group.Category.AIRPLANE and 3000 or 300)) * 0.3048
                 unitData.speed = (tonumber(params.spd) or (unitCategory == Group.Category.AIRPLANE and 430 or 135)) * 0.514444
             elseif unitCategory == Group.Category.GROUND and i > 1 then
-                -- Trail formation for ground units
                 local spacing = 200 -- 200 meters
                 local distance = (i - 1) * spacing
                 unitData.x = location.x - math.cos(headingRad) * distance
@@ -416,15 +450,16 @@ function markspawn.spawner.spawnObject(location, params)
         local result = coalition.addGroup(countryID, unitCategory, newGroup)
         if result then
             local actualGroupName = result:getName()
-            markspawn.notify("Spawned group: " .. actualGroupName .. " with " .. amount .. " unit(s).")
+            markspawn.notify("Spawned group: " .. actualGroupName .. " with " .. amount .. " unit(s).", 10, unitId)
             table.insert(markspawn.spawnedGroups, {name = actualGroupName})
             markspawn.menu.updateDeleteMenu()
             
             params.category = unitCategory
             
-            timer.scheduleFunction(function() markspawn.postSpawnSetup(actualGroupName, location, params) end, {}, timer.getTime() + 2)
+            -- Pass unitId to the post spawn setup function
+            timer.scheduleFunction(function() markspawn.postSpawnSetup(actualGroupName, location, params, unitId) end, {}, timer.getTime() + 2)
         else
-            markspawn.notify("Failed to spawn unit: " .. unitType)
+            markspawn.notify("Failed to spawn unit: " .. unitType, 10, unitId)
         end
     end
 end
@@ -432,14 +467,21 @@ end
 ---------------------------------------------------------------------------------------------------
 -- Event Handler & Mission Setup
 ---------------------------------------------------------------------------------------------------
+-- This now captures the initiator's Unit ID to send targeted messages.
 function markspawn.eventHandler(event)
+    -- event.id == 26 is S_EVENT_SEND_CHAT_MESSAGE
     if event.id == 26 and event.text and event.text:lower():startsWith(markspawn.commandIdent) then
+        -- event.initiator is the unit that sent the command
+        local initiatorUnit = event.initiator
+        if not initiatorUnit then return end -- Should not happen for event 26
+        local initiatorUnitId = initiatorUnit:getID()
+
         local command, _, params_str = event.text:find("spawn,(.+)")
         if params_str then
             local params = markspawn.getMessageParameters(params_str)
-            markspawn.spawner.spawnObject(event.pos, params)
+            markspawn.spawner.spawnObject(event.pos, params, initiatorUnitId)
         else
-            markspawn.notify("Invalid format. Use: spawn,type=... or spawn,temp=...")
+            markspawn.notify("Invalid format. Use: spawn,type=... or spawn,temp=...", 10, initiatorUnitId)
         end
     end
 end
