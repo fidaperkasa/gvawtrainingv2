@@ -2,7 +2,7 @@
 --
 -- GVAW MarkSpawn Enhanched - Universal Spawning Script for DCS World
 -- By EagleEye - DCS Indonesia
--- Version 3.0.2 - Corrected for private user notifications
+-- Version 3.0.3
 --
 -- =================================================================================================
 --[[
@@ -389,11 +389,11 @@ function markspawn.spawner.spawnObject(location, params, unitId)
     local unitType = params.type
     local unitCategory = markspawn.getUnitCategory(unitType)
     if not unitCategory then markspawn.notify("Error: Unit type '" .. unitType .. "' not found in database.", 10, unitId); return end
-    local countryName = params.country or "USA"
+    local countryName = params.country or "CJTF_RED"
     params.heading = tonumber(params.hdg) or 360
     local headingRad = math.rad(params.heading)
     local countryID = country.id[countryName]
-    if not countryID then markspawn.notify("Error: Country '" .. countryName .. "' is not valid.", 10, unitId); countryID = country.id.USA end
+    if not countryID then markspawn.notify("Error: Country '" .. countryName .. "' is not valid.", 10, unitId); countryID = country.id.CJTF_RED end
     
     if unitCategory == "STATIC" then
         local newStatic = { type = unitType, name = unitType .. "_" .. math.random(1000, 9999), x = location.x, y = location.z, heading = headingRad }
