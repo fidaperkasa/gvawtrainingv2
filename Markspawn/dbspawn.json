@@ -33,7 +33,10 @@
     "ZU-23 Insurgent", "ZiL-131 APA-80", "bofors40", "fire_control", "flak18", "flak30", "flak36", "flak37", "flak38", "flak41", "generator_5i57",
     "house1arm", "house2arm", "houseA_arm", "hy_launcher", "leopard-2A4", "leopard-2A4_trs", "outpost", "outpost_road", "outpost_road_l",
     "outpost_road_r", "p-19 s-125 sr", "r11_volvo_drivable", "rapier_fsa_blindfire_radar", "rapier_fsa_launcher", "rapier_fsa_optical_tracker_unit",
-    "snr s-125 tr", "soldier_mauser98", "soldier_wwii_br_01", "soldier_wwii_us", "tacr2a", "tt_B8M1", "tt_DSHK", "tt_KORD", "tt_ZU-23", "v1_launcher"
+    "snr s-125 tr", "soldier_mauser98", "soldier_wwii_br_01", "soldier_wwii_us", "tacr2a", "tt_B8M1", "tt_DSHK", "tt_KORD", "tt_ZU-23", "v1_launcher", 
+    "CCKW_353", "CHAP_9K720_Cluster", "CHAP_9K720_HE", "CHAP_BMPT", "CHAP_FV101", "CHAP_FV107", "CHAP_IRISTSLM_CP", "CHAP_IRISTSLM_LN", "CHAP_IRISTSLM_STR", 
+    "CHAP_M1083", "CHAP_M1130", "CHAP_M142_ATACMS_M39A1", "CHAP_M142_ATACMS_M48", "CHAP_M142_GMLRS_M30", "CHAP_M142_GMLRS_M31", "CHAP_MATV", "CHAP_PantsirS1", 
+    "CHAP_T64BV", "CHAP_T84OplotM", "CHAP_T90M", "CHAP_TOS1A", "CHAP_TorM2"
   ],
   "PLANE": [
     "A-10A", "A-10C", "A-10C_2", "A-20G", "A-50", "AJS37", "AV8BNA", "An-26B", "An-30M", "B-17G", "B-1B", "B-52H", "Bf-109K-4", "C-101CC",
@@ -60,7 +63,7 @@
     "La_Combattante_II", "MOLNIYA", "MOSCOW", "NEUSTRASH", "PERRY", "PIOTR", "REZKY", "SOM", "Schnellboot_type_S130", "Seawise_Giant",
     "Ship_Tilde_Supply", "Stennis", "TICONDEROG", "Type_052B", "Type_052C", "Type_054A", "Type_071", "Type_093", "USS_Arleigh_Burke_IIa",
     "USS_Samuel_Chase", "Uboat_VIIC", "VINSON", "ZWEZDNY", "ara_vdm", "atconveyor", "hms_invincible", "leander-gun-achilles",
-    "leander-gun-andromeda", "leander-gun-ariadne", "leander-gun-condell", "leander-gun-lynch", "santafe", "speedboat"
+    "leander-gun-andromeda", "leander-gun-ariadne", "leander-gun-condell", "leander-gun-lynch", "santafe", "speedboat", "CHAP_Project22160", "CHAP_Project22160_TorM2KM"
   ],
   "STATIC": [
     "345 Excavator", "AM32a-60_01", "AM32a-60_02", "APFC fuel", "Airshow_Cone", "Airshow_Crowd", "B600", "Barracks 2", "Barrier A",
