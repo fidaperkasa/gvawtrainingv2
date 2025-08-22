@@ -8,8 +8,8 @@
 -- =========================================================================
 
 -- Configuration
-local checkInterval = 10              -- seconds between fuel checks
-local notificationInterval = 10      -- seconds between notifications
+local checkInterval = 1              -- seconds between fuel checks
+local notificationInterval = 1      -- seconds between notifications
 local notificationCounter = 0
 
 -- =========================================================================
@@ -48,54 +48,48 @@ end
 local function checkFuel()
     notificationCounter = notificationCounter + checkInterval
 
-    -- Mission time string (os.* is blocked in DCS sandbox)
+    -- Mission time string
     local seconds = timer.getAbsTime()
     local hours = math.floor(seconds / 3600)
     local minutes = math.floor((seconds % 3600) / 60)
     local secs = math.floor(seconds % 60)
-    local currentTime = string.format("%02d:%02d:%02d (mission time)", hours, minutes, secs)
+    local currentTime = string.format("%02d:%02d:%02d", hours, minutes, secs)
 
-    local logString = string.format("\n--- Fuel Check on %s ---\n", currentTime)
-    local notificationString = "Current Fuel Status:\n"
     local unitsInAir = getAirUnits()
+    local notificationString = "Current Fuel Status:\n"
     local humanFound = false
 
-    if #unitsInAir > 0 then
+    -- Track already written players to avoid duplicates
+    local seenPlayers = {}
+
+    -- Open file once for appending
+    local filePath = lfs.writedir() .. "Logs/fuelstate.log"
+    local file = io.open(filePath, "a")
+
+    if #unitsInAir > 0 and file then
         for _, unit in ipairs(unitsInAir) do
             local fuel = unit:getFuel() or 0
             local playerName = unit:getPlayerName()
             local unitType = unit:getDesc().displayName
-            local entry
 
-            if playerName then
-                entry = string.format("%s in %s: %.1f%%", playerName, unitType, fuel * 100)
-                notificationString = notificationString .. entry .. "\n"
+            if playerName and not seenPlayers[playerName] then
+                local fuelPercent = string.format("%.1f", fuel * 100)
+                local logLine = string.format("%s,%s,%s\n", currentTime, playerName, fuelPercent)
+
+                file:write(logLine)
+
+                notificationString = notificationString ..
+                    string.format("%s in %s: %s%%\n", playerName, unitType, fuelPercent)
                 humanFound = true
-            else
-                entry = string.format("%s (AI) in %s: %.1f%%", unit:getName(), unitType, fuel * 100)
+                seenPlayers[playerName] = true
             end
-
-            logString = logString .. entry .. "\n"
         end
+        file:close()
     else
-        logString = logString .. "No active aircraft found.\n"
         notificationString = "No active aircraft found."
     end
 
-    -- Log to dcs.log
-    env.info(logString)
-
-    -- Log to separate fuelstate.log inside /Logs/
-    local filePath = lfs.writedir() .. "Logs/fuelstate.log"
-    local file = io.open(filePath, "a")
-    if file then
-        file:write(logString)
-        file:close()
-    else
-        env.info("FuelScript ERROR: Cannot open " .. filePath)
-    end
-
-    -- Send notifications (only if humans exist)
+    -- Notifications
     if notificationCounter >= notificationInterval then
         notificationCounter = 0
         if humanFound then
@@ -103,7 +97,6 @@ local function checkFuel()
         end
     end
 
-    -- Reschedule
     return timer.getTime() + checkInterval
 end
 
