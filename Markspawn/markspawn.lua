@@ -2,7 +2,7 @@
 --
 -- GVAW MarkSpawn Enhanched - Universal Spawning Script for DCS World
 -- By EagleEye - DCS Indonesia
--- Version 3.0.3
+-- Version 3.0.2 - Corrected for private user notifications
 --
 -- =================================================================================================
 --[[
@@ -145,41 +145,34 @@ end
 -- F10 Menu Management
 ---------------------------------------------------------------------------------------------------
 markspawn.menu = {}
+markspawn.menu.rootMenu   = {}
 
+-- Delete all spawned units
 function markspawn.menu.deleteAll()
     markspawn.notify("Deleting all spawned units...")
-    local groupsToDelete = {}
-    for _, groupData in pairs(markspawn.spawnedGroups) do table.insert(groupsToDelete, groupData) end
-    for _, groupData in ipairs(groupsToDelete) do
-        local group = Group.getByName(groupData.name)
-        if group and group:isExist() then group:destroy() end
+
+    -- Delete everything we know about
+    for _, g in ipairs(markspawn.spawnedGroups or {}) do
+        local grp = Group.getByName(g.name)
+        if grp and grp:isExist() then
+            grp:destroy()
+        end
     end
+
+    -- Reset tracker
     markspawn.spawnedGroups = {}
-    markspawn.menu.updateDeleteMenu()
+    markspawn.notify("All spawned units and templates deleted.")
 end
 
-function markspawn.menu.deleteSingleGroup(args)
-    local groupName = args.groupName
-    if not groupName then return end
-    local group = Group.getByName(groupName)
-    if group and group:isExist() then group:destroy(); markspawn.notify("Deleted group: " .. groupName) end
-    for i, groupData in ipairs(markspawn.spawnedGroups) do
-        if groupData.name == groupName then table.remove(markspawn.spawnedGroups, i); break end
-    end
-    markspawn.menu.updateDeleteMenu()
-end
 
-function markspawn.menu.updateDeleteMenu()
-    missionCommands.removeItemForCoalition(coalition.side.BLUE, { "MarkSpawn" })
-    missionCommands.removeItemForCoalition(coalition.side.RED, { "MarkSpawn" })
-    markspawn.setupF10Menu()
-end
-
+-- Setup F10 menu
 function markspawn.setupF10Menu()
-    for _, coa in ipairs({coalition.side.BLUE, coalition.side.RED}) do
-        local spawnMenu = missionCommands.addSubMenuForCoalition(coa, "MarkSpawn")
-        
-        missionCommands.addCommandForCoalition(coa, "Show Command Syntax", spawnMenu, function()
+    for _, coa in ipairs({ coalition.side.BLUE, coalition.side.RED }) do
+        local root = missionCommands.addSubMenuForCoalition(coa, "MarkSpawn")
+        markspawn.menu.rootMenu[coa] = root
+
+        -- Syntax help
+        missionCommands.addCommandForCoalition(coa, "Show Command Syntax", root, function()
             local helpText = [[
             -- MARKSPAWN SYNTAX --
             Template Spawn:
@@ -191,76 +184,60 @@ function markspawn.setupF10Menu()
             markspawn.notify(helpText, 45)
         end)
 
-        local listMenu = missionCommands.addSubMenuForCoalition(coa, "List Spawnable Items", spawnMenu)
+        -- List spawnable items
+        local listMenu = missionCommands.addSubMenuForCoalition(coa, "List Spawnable Items", root)
 
-        if markspawn.unitDatabase.TEMPLATES then
-            missionCommands.addCommandForCoalition(coa, "List Templates", listMenu, function()
-                local templateNames = {}
-                for name, _ in pairs(markspawn.unitDatabase.TEMPLATES) do
-                    table.insert(templateNames, name)
+        -- Templates listing
+        if markspawn.unitDatabase and markspawn.unitDatabase.TEMPLATES then
+            local templateNames = {}
+            for name, _ in pairs(markspawn.unitDatabase.TEMPLATES) do
+                table.insert(templateNames, name)
+            end
+            table.sort(templateNames)
+
+            local chunkSize = 20
+            local templateMenu = missionCommands.addSubMenuForCoalition(coa, "List Templates", listMenu)
+
+            for i = 1, #templateNames, chunkSize do
+                local chunk = {}
+                for j = i, math.min(i + chunkSize - 1, #templateNames) do
+                    table.insert(chunk, templateNames[j])
                 end
-                table.sort(templateNames)
-        
+                local pageNum = math.floor((i - 1) / chunkSize) + 1
+                local msg = string.format("-- Templates Page %d --\n%s", pageNum, table.concat(chunk, "\n"))
+                missionCommands.addCommandForCoalition(coa, "Page " .. pageNum, templateMenu,
+                    function(_, unitId) markspawn.notify(msg, 60, unitId) end)
+            end
+        end
+
+        -- Units per category
+        local sortedCategories = { "PLANE", "HELICOPTER", "GROUND_UNIT", "SHIP", "STATIC", "CARGO" }
+        for _, cat in ipairs(sortedCategories) do
+            local unitList = markspawn.unitDatabase and markspawn.unitDatabase[cat]
+            if unitList and #unitList > 0 then
+                table.sort(unitList)
                 local chunkSize = 20
-                local delay = 5
-                local timeNow = timer.getTime() + 0.1  -- Add 0.1s safety buffer
-        
-                for i = 1, #templateNames, chunkSize do
+                local catMenu = missionCommands.addSubMenuForCoalition(coa, "List " .. cat, listMenu)
+
+                for i = 1, #unitList, chunkSize do
                     local chunk = {}
-                    for j = i, math.min(i + chunkSize - 1, #templateNames) do
-                        table.insert(chunk, templateNames[j])
+                    for j = i, math.min(i + chunkSize - 1, #unitList) do
+                        table.insert(chunk, unitList[j])
                     end
                     local pageNum = math.floor((i - 1) / chunkSize) + 1
-                    local message = string.format("-- Templates Page %d --\n%s", pageNum, table.concat(chunk, "\n"))
-        
-                    timer.scheduleFunction(function()
-                        markspawn.notify(message, 60)
-                        return nil
-                    end, nil, timeNow + ((pageNum - 1) * delay))
+                    local msg = string.format("-- %s Page %d --\n%s", cat, pageNum, table.concat(chunk, "\n"))
+                    missionCommands.addCommandForCoalition(coa, "Page " .. pageNum, catMenu,
+                        function(_, unitId) markspawn.notify(msg, 60, unitId) end)
                 end
-            end)
-        end        
-
-        local sortedCategories = {"PLANE", "HELICOPTER", "GROUND_UNIT", "SHIP", "STATIC", "CARGO"}
-        for _, categoryName in ipairs(sortedCategories) do
-            local unitList = markspawn.unitDatabase[categoryName]
-            if unitList and #unitList > 0 then
-                missionCommands.addCommandForCoalition(coa, "List " .. categoryName, listMenu, function()
-                    table.sort(unitList)
-                    local chunkSize = 20
-                    local delay = 5
-                    local timeNow = timer.getTime() + 0.1  -- Safety buffer to ensure Page 1 shows
-
-                    for i = 1, #unitList, chunkSize do
-                        local chunk = {}
-                        for j = i, math.min(i + chunkSize - 1, #unitList) do
-                            table.insert(chunk, unitList[j])
-                        end
-                        local pageNum = math.floor((i - 1) / chunkSize) + 1
-                        local message = string.format("-- %s Page %d --\n%s", categoryName, pageNum, table.concat(chunk, "\n"))
-
-                        timer.scheduleFunction(function()
-                            markspawn.notify(message, 60)
-                            return nil
-                        end, nil, timeNow + ((pageNum - 1) * delay))
-                    end
-                end)
             end
         end
 
-
-        local cleanUpMenu = missionCommands.addSubMenuForCoalition(coa, "Clean Up Units", spawnMenu)
-        missionCommands.addCommandForCoalition(coa, "Delete All Spawned Units", cleanUpMenu, markspawn.menu.deleteAll)
-        if #markspawn.spawnedGroups > 0 then
-            missionCommands.addCommandForCoalition(coa, "----------", cleanUpMenu, function() end)
-            for _, groupData in ipairs(markspawn.spawnedGroups) do
-                missionCommands.addCommandForCoalition(coa, "Delete " .. groupData.name, cleanUpMenu, markspawn.menu.deleteSingleGroup, {groupName = groupData.name})
-            end
-        end
+        -- Clean up (only one option)
+        missionCommands.addCommandForCoalition(coa, "Delete All Spawned Units", root, markspawn.menu.deleteAll)
     end
+
     markspawn.log("F10 Menu Initialized.")
 end
-
 ---------------------------------------------------------------------------------------------------
 -- Unit Tasking & Setup Functions
 ---------------------------------------------------------------------------------------------------
@@ -337,10 +314,13 @@ function markspawn.spawner.spawnTemplate(location, params, unitId)
     local templateData = markspawn.unitDatabase.TEMPLATES[templateName]
     if not templateData then markspawn.notify("Error: Template '" .. templateName .. "' not found in database.", 10, unitId); return end
 
-    local countryName = params.country
-    if not countryName then markspawn.notify("Error: 'country' parameter is required for templates.", 10, unitId); return end
+    local countryName = params.country or "CJTF_RED"
     local countryID = country.id[countryName]
-    if not countryID then markspawn.notify("Error: Country '" .. countryName .. "' is not valid.", 10, unitId); return end
+    if not countryID then
+        markspawn.notify("Error: Country '" .. countryName .. "' is not valid, defaulting to CJTF_RED.", 10, unitId)
+        countryID = country.id.CJTF_RED
+    end
+
 
     local groupCategory = Group.Category.GROUND -- All templates are assumed to be ground units for now
     local baseHeadingRad = math.rad(tonumber(params.hdg) or 0)
@@ -369,14 +349,18 @@ function markspawn.spawner.spawnTemplate(location, params, unitId)
     local newGroup = { name = groupName, task = "Ground Attack", units = unitsTable }
     
     local result = coalition.addGroup(countryID, groupCategory, newGroup)
-    if result then
-        local actualGroupName = result:getName()
+        if result then
+    local actualGroupName = result:getName()
         markspawn.notify("Spawned template: " .. actualGroupName, 10, unitId)
-        table.insert(markspawn.spawnedGroups, {name = actualGroupName})
+
+        -- Track the real group name, not just the template
+        table.insert(markspawn.spawnedGroups, { name = actualGroupName, isTemplate = true })
+
         markspawn.menu.updateDeleteMenu()
     else
         markspawn.notify("Failed to spawn template: " .. templateName, 10, unitId)
     end
+
 end
 
 function markspawn.spawner.spawnObject(location, params, unitId)
