@@ -1,0 +1,431 @@
+{
+  "TEMPLATES": {
+    "AI": {
+      "units": [
+        { "dx": 0, "dy": 0, "name": "KrAZ6322", "skill": "Average", "heading": 0 },
+        { "dx": -25, "dy": 15, "name": "GAZ-3307", "skill": "Average", "heading": 0 },
+        { "dx": 20, "dy": 25, "name": "KrAZ6322", "skill": "Average", "heading": 0 },
+        { "dx": -10, "dy": 40, "name": "BMP-1", "skill": "Average", "heading": 0 },
+        { "dx": 15, "dy": 50, "name": "GAZ-3307", "skill": "Average", "heading": 0 },
+        { "dx": -30, "dy": 60, "name": "ZSU-23-4 Shilka", "skill": "Average", "heading": 0 },
+        { "dx": 0, "dy": 10, "name": "Infantry AK", "skill": "Average", "heading": 0 }
+      ]
+    },
+    "CAS": {
+      "units": [
+        { "dx": 0, "dy": 0, "name": "T-72B", "skill": "Good", "heading": 0 },
+        { "dx": 35, "dy": 5, "name": "T-72B", "skill": "Good", "heading": 0 },
+        { "dx": -25, "dy": 15, "name": "BMP-3", "skill": "Good", "heading": 0 },
+        { "dx": 10, "dy": 25, "name": "BMP-3", "skill": "Good", "heading": 0 },
+        { "dx": -10, "dy": 30, "name": "Infantry AK", "skill": "Average", "heading": 0 },
+        { "dx": 20, "dy": 15, "name": "Infantry AK ver2", "skill": "Average", "heading": 0 },
+        { "dx": -30, "dy": 20, "name": "Infantry AK", "skill": "Average", "heading": 0 },
+        { "dx": 5, "dy": 40, "name": "Tor 9A331", "skill": "High", "heading": 0 }
+      ]
+    },
+    "CAP": {
+      "2-ship": {
+        "units": [
+          { "dx": -500, "dy": 0, "name": "F-15C", "skill": "Excellent", "heading": 0, "alt": 25000, "speed": 400 },
+          { "dx": 500, "dy": 0, "name": "F-15C", "skill": "Excellent", "heading": 0, "alt": 25000, "speed": 400 }
+        ]
+      },
+      "4-ship": {
+        "units": [
+          { "dx": -500, "dy": 0, "name": "F-15C", "skill": "Excellent", "heading": 0, "alt": 25000, "speed": 400 },
+          { "dx": 500, "dy": 0, "name": "F-15C", "skill": "Excellent", "heading": 0, "alt": 25000, "speed": 400 },
+          { "dx": -500, "dy": -500, "name": "F-15C", "skill": "Excellent", "heading": 0, "alt": 25000, "speed": 400 },
+          { "dx": 500, "dy": -500, "name": "F-15C", "skill": "Excellent", "heading": 0, "alt": 25000, "speed": 400 }
+        ]
+      }
+    },
+    "SEAD": {
+      "units": [
+        { "dx": 120.44, "dy": -112.00, "name": "ATZ-10", "skill": "High", "heading": 2.495 },
+        { "dx": 0, "dy": 0, "name": "Kub 1S91 str", "skill": "High", "heading": 0 },
+        { "dx": 2.65, "dy": 100.87, "name": "Kub 2P25 ln", "skill": "High", "heading": 4.712 },
+        { "dx": -105.82, "dy": 4.89, "name": "Kub 2P25 ln", "skill": "High", "heading": 0.034 },
+        { "dx": 25.60, "dy": 20.01, "name": "ZiL-131 APA-80", "skill": "High", "heading": 1.588 },
+        { "dx": 42.17, "dy": -20.01, "name": "Ural-4320-31", "skill": "High", "heading": 0.052 },
+        { "dx": 99.16, "dy": -3.34, "name": "Kub 2P25 ln", "skill": "High", "heading": 3.141 },
+        { "dx": 42.17, "dy": -28.81, "name": "Ural-4320-31", "skill": "High", "heading": 0.034 },
+        { "dx": -3.99, "dy": -102.25, "name": "Kub 2P25 ln", "skill": "High", "heading": 1.553 },
+        { "dx": 129.64, "dy": -104.56, "name": "ATZ-10", "skill": "High", "heading": 2.321 },
+        { "dx": 22.03, "dy": 20.11, "name": "Ural-375 PBU", "skill": "High", "heading": 1.588 },
+        { "dx": 10, "dy": -10, "name": "Infantry AK", "skill": "Average", "heading": 0 }
+      ]
+    },
+    "MANPADS": {
+      "units": [
+        { "dx": 0, "dy": 0, "name": "SA-18 Igla manpad", "skill": "High", "heading": 180 },
+        { "dx": -15, "dy": 20, "name": "SA-18 Igla manpad", "skill": "Good", "heading": 0 },
+        { "dx": 20, "dy": -10, "name": "Infantry AK ver2", "skill": "Average", "heading": 0 }
+      ]
+    },
+    "STRIKE": {
+      "units": [
+        { "dx": 0, "dy": 0, "name": "Command_Post", "skill": "High", "heading": 0 },
+        { "dx": 30, "dy": 15, "name": "T-72B", "skill": "Good", "heading": 0 },
+        { "dx": -25, "dy": 20, "name": "T-72B", "skill": "Good", "heading": 0 },
+        { "dx": 5, "dy": 40, "name": "SA-6", "skill": "High", "heading": 0 },
+        { "dx": -50, "dy": -10, "name": "Warehouse", "skill": "Average", "heading": 0 },
+        { "dx": -5, "dy": -5, "name": "Infantry AK", "skill": "Average", "heading": 0 }
+      ]
+    },
+    "RECCE": {
+      "units": [
+        { "dx": 0, "dy": 0, "name": "T-72B", "skill": "Good", "heading": 0 },
+        { "dx": 50, "dy": -10, "name": "SA-6", "skill": "High", "heading": 0 },
+        { "dx": 10, "dy": 5, "name": "Infantry AK", "skill": "Average", "heading": 0 }
+      ]
+    },
+    "US_MBT": {
+      "units": [
+        { "dx": 0, "dy": 0, "name": "M-1 Abrams", "skill": "Excellent", "heading": 0 },
+        { "dx": -30, "dy": 15, "name": "M-1 Abrams", "skill": "Excellent", "heading": 45 },
+        { "dx": 20, "dy": -25, "name": "M1A2C_SEP_V3", "skill": "Excellent", "heading": 90 },
+        { "dx": 40, "dy": 10, "name": "M-1 Abrams", "skill": "Excellent", "heading": 180 },
+        { "dx": -15, "dy": 35, "name": "M1A2C_SEP_V3", "skill": "Excellent", "heading": 270 }
+      ]
+    },
+    "RU_MBT": {
+      "units": [
+        { "dx": 0, "dy": 0, "name": "T-90", "skill": "Excellent", "heading": 0 },
+        { "dx": 25, "dy": -15, "name": "T-72B3", "skill": "Excellent", "heading": 30 },
+        { "dx": -30, "dy": 20, "name": "T-80UD", "skill": "Excellent", "heading": 120 },
+        { "dx": -10, "dy": -40, "name": "T-72B", "skill": "Excellent", "heading": 210 },
+        { "dx": 35, "dy": 45, "name": "T-90", "skill": "Excellent", "heading": 300 }
+      ]
+    },
+    "CN_MBT": {
+      "units": [
+        { "dx": 0, "dy": 0, "name": "ZTZ96B", "skill": "Excellent", "heading": 0 },
+        { "dx": -20, "dy": -10, "name": "ZTZ96B", "skill": "Excellent", "heading": 60 },
+        { "dx": 30, "dy": 25, "name": "ZTZ96B", "skill": "Excellent", "heading": 150 },
+        { "dx": -40, "dy": 15, "name": "ZTZ96B", "skill": "Excellent", "heading": 240 },
+        { "dx": 10, "dy": -35, "name": "ZTZ96B", "skill": "Excellent", "heading": 330 }
+      ]
+    },
+    "US_IFV": {
+      "units": [
+        { "dx": 0, "dy": 0, "name": "M-2 Bradley", "skill": "Good", "heading": 0 },
+        { "dx": 20, "dy": 10, "name": "M-2 Bradley", "skill": "Good", "heading": 50 },
+        { "dx": -15, "dy": 30, "name": "M1126 Stryker ICV", "skill": "Good", "heading": 100 },
+        { "dx": -30, "dy": -5, "name": "M-2 Bradley", "skill": "Good", "heading": 150 },
+        { "dx": 5, "dy": 40, "name": "M1126 Stryker ICV", "skill": "Good", "heading": 200 }
+      ]
+    },
+    "RU_IFV": {
+      "units": [
+        { "dx": 0, "dy": 0, "name": "BMP-3", "skill": "Good", "heading": 0 },
+        { "dx": -10, "dy": 25, "name": "BMP-2", "skill": "Good", "heading": 70 },
+        { "dx": 15, "dy": -20, "name": "BMP-1", "skill": "Good", "heading": 140 },
+        { "dx": -30, "dy": -30, "name": "BMP-3", "skill": "Good", "heading": 210 },
+        { "dx": 40, "dy": 5, "name": "BMP-2", "skill": "Good", "heading": 280 }
+      ]
+    },
+    "CN_IFV": {
+      "units": [
+        { "dx": 0, "dy": 0, "name": "ZBD04A", "skill": "Good", "heading": 0 },
+        { "dx": 20, "dy": -10, "name": "ZBD04A", "skill": "Good", "heading": 90 },
+        { "dx": -15, "dy": 30, "name": "ZBD04A", "skill": "Good", "heading": 180 },
+        { "dx": 25, "dy": 20, "name": "ZBD04A", "skill": "Good", "heading": 270 },
+        { "dx": -35, "dy": -25, "name": "ZBD04A", "skill": "Good", "heading": 350 }
+      ]
+    },
+    "US_APC": {
+      "units": [
+        { "dx": 0, "dy": 0, "name": "M-113", "skill": "Average", "heading": 0 },
+        { "dx": -15, "dy": 10, "name": "M1126 Stryker ICV", "skill": "Average", "heading": 40 },
+        { "dx": 20, "dy": 25, "name": "M-113", "skill": "Average", "heading": 80 },
+        { "dx": -25, "dy": -10, "name": "M1126 Stryker ICV", "skill": "Average", "heading": 120 },
+        { "dx": 30, "dy": -20, "name": "M-113", "skill": "Average", "heading": 160 }
+      ]
+    },
+    "RU_APC": {
+      "units": [
+        { "dx": 0, "dy": 0, "name": "BTR-80", "skill": "Average", "heading": 0 },
+        { "dx": 10, "dy": 15, "name": "BTR-82A", "skill": "Average", "heading": 55 },
+        { "dx": -20, "dy": -10, "name": "BTR-80", "skill": "Average", "heading": 110 },
+        { "dx": 25, "dy": -25, "name": "BTR-82A", "skill": "Average", "heading": 165 },
+        { "dx": -30, "dy": 30, "name": "BTR_D", "skill": "Average", "heading": 220 }
+      ]
+    },
+    "US_TRUCK": {
+      "units": [
+        { "dx": 0, "dy": 0, "name": "Hummer", "skill": "Average", "heading": 0 },
+        { "dx": 10, "dy": 15, "name": "HEMTT TFFT", "skill": "Average", "heading": 45 },
+        { "dx": -20, "dy": 30, "name": "M978 HEMTT Tanker", "skill": "Average", "heading": 90 },
+        { "dx": 35, "dy": 40, "name": "Hummer", "skill": "Average", "heading": 135 },
+        { "dx": -40, "dy": 50, "name": "HEMTT TFFT", "skill": "Average", "heading": 180 }
+      ]
+    },
+    "RU_TRUCK": {
+      "units": [
+        { "dx": 0, "dy": 0, "name": "Ural-4320-31", "skill": "Average", "heading": 0 },
+        { "dx": -15, "dy": 10, "name": "GAZ-3307", "skill": "Average", "heading": 60 },
+        { "dx": 20, "dy": 25, "name": "KrAZ6322", "skill": "Average", "heading": 120 },
+        { "dx": -30, "dy": 40, "name": "Ural-4320-31", "skill": "Average", "heading": 180 },
+        { "dx": 40, "dy": 50, "name": "GAZ-3307", "skill": "Average", "heading": 240 }
+      ]
+    },
+    "SAM2": {
+        "units": [
+            { "dx": 80.690318209992, "dy": 54.289070001002997, "name": "S_75M_Volhov", "skill": "High", "heading": 0.92502450355699 },
+            { "dx": 0, "dy": 0, "name": "SNR_75V", "skill": "High", "heading": 0.003888504151801 },
+            { "dx": 79.099061770001001, "dy": -47.096697396998998, "name": "S_75M_Volhov", "skill": "High", "heading": 5.4803338512622 },
+            { "dx": -1.8276942700031, "dy": -98.244225791996996, "name": "S_75M_Volhov", "skill": "High", "heading": 4.6774823953448 },
+            { "dx": 29.956672100001001, "dy": 44.636165101998003, "name": "Land_Rover_109_S3", "skill": "High", "heading": 4.1713369122664 },
+            { "dx": 25.126949860001002, "dy": 47.889142120998997, "name": "Land_Rover_101_FC", "skill": "High", "heading": 4.1713369122664 },
+            { "dx": -85.254996140006995, "dy": -46.869375048001999, "name": "S_75M_Volhov", "skill": "High", "heading": 3.8048177693476 },
+            { "dx": 0.21820687000582, "dy": 106.800532486999998, "name": "S_75M_Volhov", "skill": "High", "heading": 1.535889741755 },
+            { "dx": -87.755541970007002, "dy": 57.926227575996997, "name": "S_75M_Volhov", "skill": "High", "heading": 2.3561944901923 }
+        ]
+    },
+    "RapierSAM": {
+        "units": [
+            { "dx": 36.182838894005002, "dy": 58.774643101001999, "name": "Land_Rover_109_S3", "skill": "High", "heading": 4.1364303272266 },
+            { "dx": 0, "dy": 0, "name": "rapier_fsa_blindfire_radar", "skill": "High", "heading": 0.013157135472537 },
+            { "dx": -14.178539628003, "dy": 10.201632172, "name": "rapier_fsa_optical_tracker_unit", "skill": "High", "heading": 3.1590459461097 },
+            { "dx": -50.662342819995999, "dy": 58.961975772995999, "name": "rapier_fsa_launcher", "skill": "High", "heading": 5.7595865315813 },
+            { "dx": 32.038867964002002, "dy": 61.828095364996003, "name": "Land_Rover_109_S3", "skill": "High", "heading": 4.1364303272266 },
+            { "dx": 22.442303705, "dy": 69.897933492990006, "name": "Land_Rover_101_FC", "skill": "High", "heading": 4.1364303272266 },
+            { "dx": -54.812159295994, "dy": -56.368340475004999, "name": "rapier_fsa_launcher", "skill": "High", "heading": 0.80285145591739 },
+            { "dx": 52.758722615996, "dy": 42.634966845987996, "name": "Land_Rover_101_FC", "skill": "High", "heading": 4.1364303272266 },
+            { "dx": -66.224154607000003, "dy": 1.2103631389909, "name": "rapier_fsa_launcher", "skill": "High", "heading": 0.017453292519943 },
+            { "dx": 49.050959151995002, "dy": 45.906522844001003, "name": "Land_Rover_109_S3", "skill": "High", "heading": 4.1364303272266 },
+            { "dx": 39.890602358005999, "dy": 55.066879637001001, "name": "Land_Rover_101_FC", "skill": "High", "heading": 4.1364303272266 }
+        ]
+    },
+    "NASAMS": {
+        "units": [
+            { "dx": 0, "dy": 0, "name": "NASAMS_Command_Post", "skill": "High", "heading": 6.2765352930821 },
+            { "dx": -14.042657040990999, "dy": 54.532318175886999, "name": "NASAMS_LN_B", "skill": "High", "heading": 2.3561944901923 },
+            { "dx": 51.255698199675003, "dy": -5.1489742484409, "name": "NASAMS_LN_B", "skill": "High", "heading": 6.2765352930821 },
+            { "dx": 29.255535502103001, "dy": 55.936583879986003, "name": "NASAMS_LN_C", "skill": "High", "heading": 1.5707963267949 },
+            { "dx": 21.063985561486, "dy": 15.680967029068, "name": "NASAMS_Radar_MPQ64F1", "skill": "High", "heading": 6.2765352930821 },
+            { "dx": -18.499094251951, "dy": -14.299637664692, "name": "M 818", "skill": "High", "heading": 1.5707963267949 },
+            { "dx": -7.042956299847, "dy": -18.311686379602001, "name": "M 818", "skill": "High", "heading": 1.5707963267949 }
+        ]
+    },
+    "HawkSAM": {
+        "units": [
+            { "dx": -128.172593770300011, "dy": 193.915676030040004, "name": "Hawk ln", "skill": "High", "heading": 2.0943951023932 },
+            { "dx": -81.161166684400001, "dy": 124.52753782005, "name": "Hawk tr", "skill": "High", "heading": 2.0943951023932 },
+            { "dx": -158.3543721753, "dy": -72.742177059989999, "name": "Hawk ln", "skill": "High", "heading": 3.1415926535898 },
+            { "dx": 0, "dy": 0, "name": "Hawk pcp", "skill": "High", "heading": 0 },
+            { "dx": 32.462843386899998, "dy": -46.775104149942997, "name": "Hawk sr", "skill": "High", "heading": 0 },
+            { "dx": -85.179436740400007, "dy": -124.969137579960005, "name": "Hawk tr", "skill": "High", "heading": 4.1887902047864 },
+            { "dx": 131.236375662900002, "dy": 0.27806011005305, "name": "Hawk tr", "skill": "High", "heading": 0 },
+            { "dx": -158.297652282000001, "dy": 73.103214090050002, "name": "Hawk ln", "skill": "High", "heading": 3.1415926535898 },
+            { "dx": 150.093782385600008, "dy": -85.681908679950993, "name": "Hawk ln", "skill": "High", "heading": 5.235987755983 },
+            { "dx": -16.482593013100001, "dy": -188.149662139940006, "name": "Hawk ln", "skill": "High", "heading": 5.235987755983 },
+            { "dx": 222.319793379200007, "dy": -0.30758648994379, "name": "Hawk ln", "skill": "High", "heading": 0 },
+            { "dx": -12.595401708700001, "dy": 193.544393350019988, "name": "Hawk ln", "skill": "High", "heading": 1.0471975511966 },
+            { "dx": -53.793146513499998, "dy": 0.77618211001391, "name": "Hawk cwar", "skill": "High", "heading": 0 },
+            { "dx": -131.899589524100008, "dy": -201.624451519979999, "name": "Hawk ln", "skill": "High", "heading": 4.1887902047864 },
+            { "dx": 32.139762262799998, "dy": 46.870725950051998, "name": "Hawk cwar", "skill": "High", "heading": 0 },
+            { "dx": 149.351486750100008, "dy": 91.726748220039994, "name": "Hawk ln", "skill": "High", "heading": 1.0471975511966 }
+        ]
+    },
+    "PatriotSAM": {
+        "units": [
+            { "dx": 0, "dy": 0, "name": "Patriot str", "skill": "High", "heading": 0 },
+            { "dx": -19.600043525570001, "dy": 9.2644465620397, "name": "Patriot EPP", "skill": "High", "heading": 0 },
+            { "dx": -52.779034586449001, "dy": -20.804649357451002, "name": "Patriot AMG", "skill": "High", "heading": 4.7123889803847 },
+            { "dx": 302.626003614689978, "dy": -119.572231354660005, "name": "Patriot ln", "skill": "High", "heading": 0 },
+            { "dx": -81.188374167250004, "dy": -130.701641526999992, "name": "Hummer", "skill": "High", "heading": 5.9341194567807 },
+            { "dx": -95.083442423492997, "dy": -114.726756931170002, "name": "M 818", "skill": "High", "heading": 5.9341194567807 },
+            { "dx": 173.228274599239995, "dy": -34.485543311923003, "name": "Patriot ln", "skill": "High", "heading": 0 },
+            { "dx": -55.049316178425002, "dy": -162.071895041390007, "name": "M 818", "skill": "High", "heading": 5.9341194567807 },
+            { "dx": -35.511640445037997, "dy": 16.237250822945001, "name": "Patriot cp", "skill": "High", "heading": 0 },
+            { "dx": 287.46380476618998, "dy": 8.945929579786, "name": "Patriot ln", "skill": "High", "heading": 0 },
+            { "dx": -26.639011004648999, "dy": 25.619801495457001, "name": "M 818", "skill": "High", "heading": 1.5707963267949 },
+            { "dx": 32.720021415094003, "dy": -273.173193070569994, "name": "Soldier stinger", "skill": "High", "heading": 6.2482787221397 },
+            { "dx": 101.783401336750003, "dy": 47.897296695388, "name": "Patriot ln", "skill": "High", "heading": 0.3490658503988 },
+            { "dx": -35.248201985028999, "dy": -0.87074125872459, "name": "Patriot ECS", "skill": "High", "heading": 0 },
+            { "dx": 136.71587389410999, "dy": -115.36026572902, "name": "Patriot ln", "skill": "High", "heading": 5.9341194567807 },
+            { "dx": 187.952001560599996, "dy": 104.061031022340003, "name": "Patriot ln", "skill": "High", "heading": 0.3490658503988 },
+            { "dx": -31.679157461505, "dy": 171.217757333190008, "name": "Soldier stinger", "skill": "High", "heading": 5.9341194567807 },
+            { "dx": 233.222846791790005, "dy": -169.504406087450008, "name": "Patriot ln", "skill": "High", "heading": 5.9341194567807 },
+            { "dx": 46.357670822879001, "dy": -267.344046721929999, "name": "Gepard", "skill": "High", "heading": 0 },
+            { "dx": 139.899690715649996, "dy": -62.418091102269997, "name": "M 818", "skill": "High", "heading": 5.9341194567807 },
+            { "dx": -68.129344288550996, "dy": -146.069916327719994, "name": "Hummer", "skill": "High", "heading": 5.9341194567807 }
+        ]
+    },
+    "SAM3": {
+        "units": [
+            { "dx": -0.19719014999282, "dy": 16.417675958996998, "name": "ZIL-131 KUNG", "skill": "High", "heading": 1.5707963267949 },
+            { "dx": 0, "dy": 0, "name": "snr s-125 tr", "skill": "High", "heading": 6.2641478001644 },
+            { "dx": -54.395544479994001, "dy": 20.411364487998, "name": "5p73 s-125 ln", "skill": "High", "heading": 3.1590459461097 },
+            { "dx": -26.404573919994, "dy": 38.533723629996999, "name": "5p73 s-125 ln", "skill": "High", "heading": 3.1590459461097 },
+            { "dx": 6.6801895600074, "dy": 13.694317328001, "name": "ZiL-131 APA-80", "skill": "High", "heading": 3.1241393610699 },
+            { "dx": 73.148097120006994, "dy": 24.177887044999999, "name": "GAZ-66", "skill": "High", "heading": 1.6057029118348 },
+            { "dx": -28.378296209994001, "dy": -36.108864519002999, "name": "5p73 s-125 ln", "skill": "High", "heading": 3.1590459461097 },
+            { "dx": 67.422903450001996, "dy": 24.220744209997001, "name": "GAZ-66", "skill": "High", "heading": 1.6406094968747 },
+            { "dx": -55.65154957, "dy": -15.115636602, "name": "5p73 s-125 ln", "skill": "High", "heading": 3.1590459461097 },
+            { "dx": 33.753619990006001, "dy": -73.286112753005, "name": "p-19 s-125 sr", "skill": "High", "heading": 6.2641478001644 },
+            { "dx": 39.803062310005998, "dy": -66.502451588, "name": "ZiL-131 APA-80", "skill": "High", "heading": 1.6406094968747 },
+            { "dx": 62.727714700013003, "dy": 24.526952171000001, "name": "GAZ-66", "skill": "High", "heading": 1.5707963267949 }
+        ]
+    },
+    "SAM6": {
+        "units": [
+            { "dx": 120.441348140000002, "dy": -112.000602514999997, "name": "ATZ-10", "skill": "High", "heading": 2.4958208303519 },
+            { "dx": 0, "dy": 0, "name": "Kub 1S91 str", "skill": "High", "heading": 0 },
+            { "dx": 2.6563550499995, "dy": 100.877549924999997, "name": "Kub 2P25 ln", "skill": "High", "heading": 4.7123889803847 },
+            { "dx": -105.82160159, "dy": 4.8958284879991, "name": "Kub 2P25 ln", "skill": "High", "heading": 0.034906585039887 },
+            { "dx": 25.605996860002001, "dy": 20.019633917, "name": "ZiL-131 APA-80", "skill": "High", "heading": 1.5882496193148 },
+            { "dx": 42.172491459991001, "dy": -20.017069267, "name": "Ural-4320-31", "skill": "High", "heading": 0.05235987755983 },
+            { "dx": 99.169831179998994, "dy": -3.3463691979996, "name": "Kub 2P25 ln", "skill": "High", "heading": 3.1415926535898 },
+            { "dx": 42.172491459991001, "dy": -28.818736966997999, "name": "Ural-4320-31", "skill": "High", "heading": 0.034906585039887 },
+            { "dx": -3.9905785699957, "dy": -102.252741427000004, "name": "Kub 2P25 ln", "skill": "High", "heading": 1.553343034275 },
+            { "dx": 129.642299529989998, "dy": -104.569064854000004, "name": "ATZ-10", "skill": "High", "heading": 2.3212879051525 },
+            { "dx": 22.038305519992999, "dy": 20.113878987999001, "name": "Ural-375 PBU", "skill": "High", "heading": 1.5882496193148 }
+        ]
+    },
+    "SAM10": {
+        "units": [
+            { "dx": 0, "dy": 0, "name": "S-300PS 40B6M tr", "skill": "High", "heading": 4.7123889803847 },
+            { "dx": 0.69314285001019, "dy": 127.975714280039995, "name": "S-300PS 40B6MD sr", "skill": "High", "heading": 0 },
+            { "dx": 23.57923499, "dy": 246.554675240069997, "name": "S-300PS 54K6 cp", "skill": "High", "heading": 3.1415926535898 },
+            { "dx": -22.516027820005998, "dy": 246.554675240069997, "name": "S-300PS 64H6E sr", "skill": "High", "heading": 3.1415926535898 },
+            { "dx": 83.349983280000998, "dy": -1.3806866999948, "name": "S-300PS 5P85C ln", "skill": "High", "heading": 3.1415926535898 },
+            { "dx": 82.498640570033004, "dy": 16.104647490080001, "name": "S-300PS 5P85D ln", "skill": "High", "heading": 3.3161255787892 },
+            { "dx": 82.547616210008997, "dy": -18.227276489954001, "name": "S-300PS 5P85D ln", "skill": "High", "heading": 2.9670597283904 },
+            { "dx": -82.640406330000005, "dy": -0.41562629991677, "name": "S-300PS 5P85C ln", "skill": "High", "heading": 0 },
+            { "dx": -81.939684969954996, "dy": 17.115632730070999, "name": "S-300PS 5P85D ln", "skill": "High", "heading": 6.1086523819802 },
+            { "dx": -81.939684969954996, "dy": -17.994543700013001, "name": "S-300PS 5P85D ln", "skill": "High", "heading": 0.17453292519943 },
+            { "dx": -9.0858776899986, "dy": 187.677135089990003, "name": "generator_5i57", "skill": "High", "heading": 1.5707963267949 },
+            { "dx": 0.83760223002173, "dy": 187.518112919989989, "name": "generator_5i57", "skill": "High", "heading": 1.5707963267949 },
+            { "dx": -59.823818979959, "dy": 168.634684880029994, "name": "ATZ-5", "skill": "High", "heading": 0 },
+            { "dx": -59.823818979959, "dy": 179.265434380040006, "name": "ATZ-5", "skill": "High", "heading": 0 },
+            { "dx": 20.947679330012999, "dy": -62.811427220003999, "name": "KrAZ6322", "skill": "High", "heading": 1.5707963267949 },
+            { "dx": 66.751355710032001, "dy": 151.355920900010005, "name": "TZ-22_KrAZ", "skill": "High", "heading": 3.9269908169872 },
+            { "dx": 59.639269180013997, "dy": 158.468007430080007, "name": "TZ-22_KrAZ", "skill": "High", "heading": 3.9269908169872 },
+            { "dx": -16.327227619999999, "dy": -62.472874669939998, "name": "KrAZ6322", "skill": "High", "heading": 1.5707963267949 }
+        ]
+    },
+    "SAM11": {
+        "units": [
+            { "dx": 120.441348140000002, "dy": -112.000602514999997, "name": "ATZ-10", "skill": "High", "heading": 2.4958208303519 },
+            { "dx": 0, "dy": 0, "name": "SA-11 Buk SR 9S18M1", "skill": "High", "heading": 0 },
+            { "dx": 2.6563550499995, "dy": 100.877549924999997, "name": "SA-11 Buk LN 9A310M1", "skill": "High", "heading": 4.7123889803847 },
+            { "dx": -105.82160159, "dy": 4.8958284879991, "name": "SA-11 Buk LN 9A310M1", "skill": "High", "heading": 0.034906585039887 },
+            { "dx": 27.63662248, "dy": 21.425097783998002, "name": "ZiL-131 APA-80", "skill": "High", "heading": 1.5882496193148 },
+            { "dx": 42.172491459991001, "dy": -20.017069267, "name": "Ural-4320-31", "skill": "High", "heading": 0.05235987755983 },
+            { "dx": 99.169831179998994, "dy": -3.3463691979996, "name": "SA-11 Buk LN 9A310M1", "skill": "High", "heading": 3.1415926535898 },
+            { "dx": 42.172491459991001, "dy": -28.818736966997999, "name": "Ural-4320-31", "skill": "High", "heading": 0.034906585039887 },
+            { "dx": -3.9905785699957, "dy": -102.252741427000004, "name": "SA-11 Buk LN 9A310M1", "skill": "High", "heading": 1.553343034275 },
+            { "dx": 129.642299529989998, "dy": -104.569064854000004, "name": "ATZ-10", "skill": "High", "heading": 2.3212879051525 },
+            { "dx": -13.972843719996, "dy": -17.667666831003, "name": "SA-11 Buk CC 9S470M1", "skill": "High", "heading": 1.553343034275 },
+            { "dx": 22.603219309996, "dy": 21.425097783998002, "name": "Ural-375 PBU", "skill": "High", "heading": 1.5882496193148 }
+        ]
+    },
+    "SAM5": {
+        "units": [
+            { "dx": 0, "dy": 0, "name": "RPC_5N62V", "skill": "High", "heading": 0 },
+            { "dx": -21.700644880009001, "dy": 46.873392940033, "name": "p-19 s-125 sr", "skill": "High", "heading": 0 },
+            { "dx": -53.291560299986003, "dy": -96.214918539975997, "name": "S-200_Launcher", "skill": "High", "heading": 0 },
+            { "dx": -50.615134440013001, "dy": 96.785124419956006, "name": "S-200_Launcher", "skill": "High", "heading": 0 },
+            { "dx": 37.9898636, "dy": -128.447876370050011, "name": "S-200_Launcher", "skill": "High", "heading": 0 },
+            { "dx": 42.272167960007003, "dy": 132.772689479989992, "name": "S-200_Launcher", "skill": "High", "heading": 0 },
+            { "dx": 138.760560350030005, "dy": -94.454724150011003, "name": "S-200_Launcher", "skill": "High", "heading": 0 },
+            { "dx": 136.79007635004001, "dy": 94.711739629972996, "name": "S-200_Launcher", "skill": "High", "heading": 0 },
+            { "dx": 46.961911459394997, "dy": -62.291868640342997, "name": "Ural-375", "skill": "High", "heading": 5.4628805587423 },
+            { "dx": 46.463913819985002, "dy": 64.697529679978999, "name": "Ural-375", "skill": "High", "heading": 0.78539816339745 },
+            { "dx": 137.668498469690007, "dy": 0.55932146019768, "name": "Tor 9A331", "skill": "High", "heading": 5.8643062867009 }
+        ]
+    },
+    "US_EWR": {
+        "units": [
+            { "dx": 0, "dy": 0, "name": "FPS-117 ECS", "skill": "High", "heading": 0 },
+            { "dx": -21.700644880009001, "dy": 46.873392940033, "name": "1126 Stryker ICV", "skill": "High", "heading": 0 },
+            { "dx": 46.961911459394997, "dy": -62.291868640342997, "name": "HEMTT_C-RAM_Phalanx", "skill": "High", "heading": 5.4628805587423 },
+            { "dx": 46.463913819985002, "dy": 64.697529679978999, "name": "Bedford_MWD", "skill": "High", "heading": 0.78539816339745 }
+        ]
+    },
+    "RU_EWR": {
+        "units": [
+            { "dx": 0, "dy": 0, "name": "55G6 EWR", "skill": "High", "heading": 0 },
+            { "dx": -21.700644880009001, "dy": 46.873392940033, "name": "BTR-80", "skill": "High", "heading": 0 },
+            { "dx": 46.961911459394997, "dy": -62.291868640342997, "name": "ZSU-23-4 Shilka", "skill": "High", "heading": 5.4628805587423 },
+            { "dx": 46.463913819985002, "dy": 64.697529679978999, "name": "Ural-375", "skill": "High", "heading": 0.78539816339745 }
+        ]
+    },
+    "CN_SHORAD": {
+      "units": [
+        { "dx": 0, "dy": 0, "name": "HQ-7_LN_P", "skill": "High", "heading": 0 },
+        { "dx": 20, "dy": 25, "name": "HQ-7_STR_SP", "skill": "Good", "heading": 180 },
+        { "dx": -30, "dy": 15, "name": "ZTZ96B", "skill": "Good", "heading": 90 },
+        { "dx": -10, "dy": -30, "name": "Infantry AK", "skill": "Average", "heading": 270 },
+        { "dx": 40, "dy": -5, "name": "Infantry AK ver2", "skill": "Average", "heading": 135 }
+      ]
+    },
+    "RU_SHORAD": {
+      "units": [
+        { "dx": 0, "dy": 0, "name": "2S6 Tunguska", "skill": "High", "heading": 0 },
+        { "dx": 30, "dy": 15, "name": "Tor 9A331", "skill": "High", "heading": 45 },
+        { "dx": 40, "dy": -10, "name": "BTR-80", "skill": "Average", "heading": 270 },
+        { "dx": -15, "dy": 35, "name": "Infantry AK ver2", "skill": "Average", "heading": 90 },
+        { "dx": -25, "dy": 35, "name": "Infantry AK ver2", "skill": "Average", "heading": 90 }
+      ]
+    },
+    "US_SHORAD": {
+      "units": [
+        { "dx": 0, "dy": 0, "name": "M1097 Avenger", "skill": "High", "heading": 0 },
+        { "dx": -20, "dy": 10, "name": "M6 Linebacker", "skill": "High", "heading": 225 },
+        { "dx": -10, "dy": -30, "name": "M-2 Bradley", "skill": "Good", "heading": 180 },
+        { "dx": 40, "dy": 20, "name": "Soldier M4 GRG", "skill": "Good", "heading": 315 },
+        { "dx": 20, "dy": 20, "name": "Soldier M4 GRG", "skill": "Good", "heading": 315 }
+      ]
+    }
+  },
+  "GROUND_UNIT": [
+    "ATMZ-5", "ATZ-10", "ATZ-5", "ATZ-60_Maz", "GAZ-3307", "GAZ-3308", "GAZ-66", "HEMTT TFFT", "Hummer", "IKARUS Bus", "JTAC", "KAMAZ Truck", "KrAZ6322", "LARC-V", "LAZ Bus", "Land_Rover_101_FC", "Land_Rover_109_S3", "M 818", "M4_Tractor", "M978 HEMTT Tanker", "MAZ-6303", 
+    "MJ-1_drivable", "P20_drivable", "Predator GCS", "Predator TrojanSpirit", "UAZ-469", "Ural ATsP-6", "Ural-375", 
+    "Ural-4320 APA-5D", "Ural-4320-31", "Ural-4320T", "ZIL-131 KUNG", "ZIL-135", "ZIL-4331", "ZiL-131 APA-80", "generator_5i57", "house1arm", 
+    "house2arm", "houseA_arm", "outpost", "outpost_road", "outpost_road_l", "outpost_road_r", 
+    "r11_volvo_drivable", 
+    "AAV7", "BMD-1", "BMP-1", "BMP-2", "BMP-3", "BRDM-2", "BTR-80", "BTR-82A", "BTR_D", 
+    "Centaur_IV", "Challenger2", "Gepard", "LAV-25", "Leclerc", 
+    "Leopard-2", "Leopard-2A5", "Leopard1A3", "M-1 Abrams", "M-60", "M1126 Stryker ICV", 
+    "M1128 Stryker MGS", "M1134 Stryker ATGM", "M1A2C_SEP_V3", "M2A1_halftrack", 
+    "MCV-80", "Marder", "MaxxPro_MRAP", "Merkava_Mk4", "MTLB",
+    "T-55", "T-72B", "T-72B3", "T-80UD", "T-90", "TPZ", "TYPE-59", 
+    "Tigr_233036", "VAB_Mephisto", "ZBD04A", "ZTZ96B", "CHAP_9K720_Cluster", "CHAP_9K720_HE", "CHAP_BMPT", "CHAP_FV101", "CHAP_FV107", "CHAP_IRISTSLM_CP", 
+    "CHAP_IRISTSLM_LN", "CHAP_IRISTSLM_STR",  "CHAP_M1083", "CHAP_M1130", "CHAP_M142_ATACMS_M39A1", 
+    "CHAP_M142_ATACMS_M48", "CHAP_M142_GMLRS_M30", "CHAP_M142_GMLRS_M31", "CHAP_MATV", "CHAP_PantsirS1",  "CHAP_T64BV", "CHAP_T84OplotM", "CHAP_T90M", "CHAP_TOS1A", "CHAP_TorM2"
+
+  ],
+  "PLANE": [
+    "A-20G", "A-50", "AJS37", "AV8BNA", "An-26B", "An-30M", "B-17G", "B-1B", "B-52H", "Bf-109K-4", "C-101CC",
+    "C-101EB", "C-130", "C-17A", "C-47", "E-2C", "E-3A", "F-117A", "F-14A-135-GR", "F-14B", "F-15C", 
+    "F-15ESE", "F-16A", "F-16C_50", "F-4E-45MC", "F-5E-3", 
+    "F-86F Sabre", "F4U-1D", "F4U-1D_CW", "FA-18A", "FA-18C_hornet", "FW-190A8", "FW-190D9", "Falcon_Gyrocopter",
+    "H-6J", "Hawk", "I-16", "IL-76MD", "IL-78M", "J-11A", "JF-17", "Ju-88A4", "KC-135", "KC-130", "KC135MPRS", "KJ-2000", "L-39C", "L-39ZA",
+    "M-2000C", "MB-339A", "MB-339APAN", "MQ-9 Reaper", "MiG-15bis", "MiG-19P", "MiG-21Bis", "MiG-23MLD", "MiG-25PD",
+    "MiG-25RBT", "MiG-27K", "MiG-29A", "MiG-29G", "MiG-29S", "MiG-31", "Mirage 2000-5", "Mirage-F1BE", "Mirage-F1CE", "Mirage-F1M-CE", "Mirage-F1M-EE", "MosquitoFBMkVI", 
+    "P-47D-30", "P-47D-30bl1", "P-47D-40", "P-51D-30-NA",
+    "P-51D", "RQ-1A Predator", "S-3B Tanker", "S-3B", "SpitfireLFMkIX", "SpitfireLFMkIXCW", "Su-17M4", "Su-24M", "Su-24MR", "Su-25",
+    "Su-25T", "Su-27", "Su-30", "Su-33", "Su-34", "TF-51D", "Tornado GR4", "Tornado IDS", "Tu-142", "Tu-160", "Tu-22M3", "Tu-95MS",
+    "WingLoong-I", "Yak-40", "Yak-52"
+  ],
+  "HELICOPTER": [
+    "AH-1W", "AH-64A", "AH-64D", "AH-64D_BLK_II", "CH-47D", "CH-47Fbl1", "CH-53E", "Ka-27", "Ka-50", "Mi-24P", "Mi-24V", "Mi-26",
+    "Mi-28N", "Mi-8MT", "OH-58D", "OH58D", "SA342L", "SA342M", "SA342Minigun", "SA342Mistral", "SH-3W", "SH-60B", "UH-1H", "UH-60A"
+  ],
+  "SHIP": [
+    "ALBATROS", "BDK-775", "CVN_71", "CVN_72", "CVN_73", "CVN_75", "CV_1143_5", "CastleClass_01", "Dry-cargo ship-1", "Dry-cargo ship-2",
+    "ELNYA", "Essex", "Forrestal", "HandyWind", "HarborTug", "Higgins_boat", "IMPROVED_KILO", "KILO", "KUZNECOW", "LHA_Tarawa", "LST_Mk2",
+    "La_Combattante_II", "MOLNIYA", "MOSCOW", "NEUSTRASH", "PERRY", "PIOTR", "REZKY", "SOM", "Schnellboot_type_S130", "Seawise_Giant",
+    "Ship_Tilde_Supply", "Stennis", "TICONDEROG", "Type_052B", "Type_052C", "Type_054A", "Type_071", "Type_093", "USS_Arleigh_Burke_IIa",
+    "USS_Samuel_Chase", "Uboat_VIIC", "VINSON", "ZWEZDNY", "ara_vdm", "atconveyor", "hms_invincible", "leander-gun-achilles",
+    "leander-gun-andromeda", "leander-gun-ariadne", "leander-gun-condell", "leander-gun-lynch", "santafe", "speedboat", "CHAP_Project22160", "CHAP_Project22160_TorM2KM"
+  ],
+  "STATIC": [
+    "container_20ft", "container_40ft", "HESCO_watchtower_1", "HESCO_watchtower_2", "HESCO_watchtower_3", "Container red 1", 
+    "Container red 2", "Container red 3", "Container white", "Container_10ft", "TV tower", "Tent01", "Tent02", "Tent03", "Tent04", 
+    "Tent05", "Black_Tyre", "Black_Tyre_RF", "Black_Tyre_WF", "Red_Flag", "White_Flag", "White_Tyre", "WindTurbine", "WindTurbine_11", "Windsock"
+  ]
+}
