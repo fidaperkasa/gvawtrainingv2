@@ -1,8 +1,5 @@
 # AAR Tracking Script (RefuelTracker) for DCS World
 
-![Version](https://img.shields.io/badge/Version-1.0.3-stable-green.svg)
-![DCS](https://img.shields.io/badge/DCS-World-2.9%2B-blue.svg)
-
 A robust Air-to-Air Refueling (AAR) tracking system for DCS World multiplayer servers. Tracks player refueling performance, provides statistics, and maintains leaderboards.
 
 ## Features
