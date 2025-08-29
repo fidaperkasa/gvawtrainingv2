@@ -2,7 +2,9 @@
 --
 -- GVAW MarkSpawn Enhanced - Universal Spawning Script for DCS World
 -- By EagleEye - DCS Indonesia
--- Version 3.0.4 - Fixed F10 menu messaging using proper group-based approach
+-- Version 3.0.6
+-- --- Expansion modification AWACS and TANKER default
+-- --- FIX error for several things
 --
 -- =================================================================================================
 
@@ -86,7 +88,7 @@ end
 markspawn.callsigns = {
     jtac = { axeman = 1, darknight = 2, warrior = 3, pointer = 4, eyeball = 5, moonbeam = 6, whiplash = 7, finger = 8, pinpoint = 9, ferret = 10, shaba = 11, playboy = 12, hammer = 13, jaguar = 14, deathstar = 15, anvil = 16, firefly = 17, mantis = 18, badger = 19 },
     tanker = { texaco = 1, arco = 2, shell = 3 },
-    awacs = { overlord = 1, magic = 2, wizard = 3, focus = 4, darkstar = 5 },
+    awacs = { overlord = 1, magic = 2, wizard = 3, focus = 4, darkstar = 5 }, -- AWACS callsigns
     aircraft = { enfield = 1, springfield = 2, uzi = 3, colt = 4, dodge = 5, ford = 6, chevy = 7, pontiac = 8 }
 }
 
@@ -100,8 +102,23 @@ function markspawn.getCallsignTable(callsignStr, unitType)
     element = tonumber(element) or 1
 
     local callsignID
-    if unitType == "KC-135MPRS" or unitType == "KC-135" or unitType == "KC-130" then
+    
+    -- Check if this is a tanker unit
+    if unitType == "KC-135MPRS" or unitType == "KC-135" or unitType == "KC-130" or unitType == "S-3B" then
         callsignID = markspawn.callsigns.tanker[name]
+        if not callsignID then
+            -- Default to Texaco if invalid callsign provided for tanker
+            callsignID = 1 -- Texaco
+            name = "texaco"
+        end
+    -- Check if this is an AWACS unit
+    elseif unitType == "E-2C" or unitType == "E-3A" or unitType == "A-50" then
+        callsignID = markspawn.callsigns.awacs[name]
+        if not callsignID then
+            -- Default to Overlord if invalid callsign provided for AWACS
+            callsignID = 1 -- Overlord
+            name = "overlord"
+        end
     elseif unitType == "JTAC" then
         callsignID = markspawn.callsigns.jtac[name]
     else
@@ -308,13 +325,30 @@ function markspawn.postSpawnSetup(groupName, spawnLocation, params, unitId)
 
     if params.category == Group.Category.AIRPLANE or params.category == Group.Category.HELICOPTER then
         local taskTable
-        if unitType == "KC-135MPRS" or unitType == "KC-135" or unitType == "KC-130" then
+        
+        -- Check for tanker types
+        if unitType == "KC-135MPRS" or unitType == "KC-135" or unitType == "KC-130" or unitType == "S-3B" then
             taskTable = markspawn.tasking.createTankerTask(spawnLocation, params)
             markspawn.notify("Tasking " .. groupName .. " as TANKER.", 10, unitId)
             if params.tacan then
                 local channelStr, band = params.tacan:match("(%d+)(%a)")
                 if channelStr and band then
                     controller:setCommand({id = 'ActivateBeacon', params = {type = 4, system = 2, channel = tonumber(channelStr), mode = band:upper(), callsign = "TKR"}})
+                    markspawn.notify(groupName .. " TACAN activated on " .. params.tacan:upper(), 10, unitId)
+                end
+            end
+        -- Check for AWACS types
+        elseif unitType == "E-2C" or unitType == "E-3A" or unitType == "A-50" then
+            taskTable = markspawn.tasking.createAWACSTask(spawnLocation, params)
+            markspawn.notify("Tasking " .. groupName .. " as AWACS.", 10, unitId)
+            
+            -- EPLRS is enabled by default for AWACS in DCS
+            markspawn.notify(groupName .. " EPLRS enabled by default for AWACS.", 10, unitId)
+            
+            if params.tacan then
+                local channelStr, band = params.tacan:match("(%d+)(%a)")
+                if channelStr and band then
+                    controller:setCommand({id = 'ActivateBeacon', params = {type = 4, system = 2, channel = tonumber(channelStr), mode = band:upper(), callsign = "AWACS"}})
                     markspawn.notify(groupName .. " TACAN activated on " .. params.tacan:upper(), 10, unitId)
                 end
             end
@@ -337,6 +371,18 @@ function markspawn.tasking.createTankerTask(spawnPos, params)
     local altAGL_Meters = (tonumber(params.alt) or 20000) * 0.3048
     local altMSL = groundY + altAGL_Meters
     return {id = 'Mission', params = {route = {points = {{x = orbitPoint1.x, y = orbitPoint1.z, alt = altMSL, speed = speedMPS, action = "Turning Point", task = { id = 'Tanker', params = {} }}, {x = orbitPoint2.x, y = orbitPoint2.z, alt = altMSL, speed = speedMPS, action = "Turning Point", task = {id = 'Orbit', params = {pattern = 'Race-Track', speed = speedMPS, altitude = altMSL}}}}}}}
+end
+
+function markspawn.tasking.createAWACSTask(spawnPos, params)
+    local headingRad = math.rad(tonumber(params.hdg) or 360)
+    local orbitRadius = 20 * 1852 -- Larger orbit for AWACS
+    local orbitCenter = {x = spawnPos.x + math.cos(headingRad) * orbitRadius, z = spawnPos.z + math.sin(headingRad) * orbitRadius}
+    local speedMPS = (tonumber(params.spd) or 300) * 0.514444 -- Slower speed for AWACS
+    local groundY = land.getHeight({x = orbitCenter.x, y = orbitCenter.z})
+    local altAGL_Meters = (tonumber(params.alt) or 25000) * 0.3048 -- Higher altitude for AWACS
+    local altMSL = groundY + altAGL_Meters
+    
+    return {id = 'Orbit', params = {pattern = 'Circle', point = { x = orbitCenter.x, y = orbitCenter.z }, speed = speedMPS, altitude = altMSL}}
 end
 
 function markspawn.tasking.createOrbitTask(spawnPos, params)
@@ -433,9 +479,17 @@ function markspawn.spawner.spawnObject(location, params, unitId)
         local callsignStr = params.callsign
         if isAircraft or unitType == "JTAC" then
             if not callsignStr then
-                if unitType == "KC-135MPRS" or unitType == "KC-135" or unitType == "KC-130" then callsignStr = "Texaco1-1"
-                elseif unitType == "JTAC" then callsignStr = "Axeman1-1"
-                else callsignStr = "Enfield" .. math.random(1,9) .. "-1" end
+                -- Default callsigns for tankers
+                if unitType == "KC-135MPRS" or unitType == "KC-135" or unitType == "KC-130" or unitType == "S-3B" then
+                    callsignStr = "Texaco1-1"
+                -- Default callsigns for AWACS
+                elseif unitType == "E-2C" or unitType == "E-3A" or unitType == "A-50" then
+                    callsignStr = "Overlord1-1"
+                elseif unitType == "JTAC" then
+                    callsignStr = "Axeman1-1"
+                else
+                    callsignStr = "Enfield" .. math.random(1,9) .. "-1"
+                end
             end
             callsignTable = markspawn.getCallsignTable(callsignStr, unitType)
             if callsignTable then groupName = callsignTable.name end
@@ -451,8 +505,27 @@ function markspawn.spawner.spawnObject(location, params, unitId)
 
             if isAircraft then
                 local groundY = land.getHeight({x = location.x, y = location.z})
-                unitData.alt = groundY + (tonumber(params.alt) or (unitCategory == Group.Category.AIRPLANE and 3000 or 300)) * 0.3048
-                unitData.speed = (tonumber(params.spd) or (unitCategory == Group.Category.AIRPLANE and 430 or 135)) * 0.514444
+                -- Set appropriate altitude based on unit type
+                local defaultAlt
+                if unitType == "E-2C" or unitType == "E-3A" or unitType == "A-50" then
+                    defaultAlt = 25000 -- AWACS altitude
+                elseif unitType == "KC-135MPRS" or unitType == "KC-135" or unitType == "KC-130" or unitType == "S-3B" then
+                    defaultAlt = 20000 -- Tanker altitude
+                else
+                    defaultAlt = (unitCategory == Group.Category.AIRPLANE and 3000 or 300)
+                end
+                unitData.alt = groundY + (tonumber(params.alt) or defaultAlt) * 0.3048
+                
+                -- Set appropriate speed based on unit type
+                local defaultSpeed
+                if unitType == "E-2C" or unitType == "E-3A" or unitType == "A-50" then
+                    defaultSpeed = 300 -- AWACS speed
+                elseif unitType == "KC-135MPRS" or unitType == "KC-135" or unitType == "KC-130" or unitType == "S-3B" then
+                    defaultSpeed = 350 -- Tanker speed
+                else
+                    defaultSpeed = (unitCategory == Group.Category.AIRPLANE and 430 or 135)
+                end
+                unitData.speed = (tonumber(params.spd) or defaultSpeed) * 0.514444
             elseif unitCategory == Group.Category.GROUND and i > 1 then
                 local spacing = 200
                 local distance = (i - 1) * spacing
@@ -463,8 +536,12 @@ function markspawn.spawner.spawnObject(location, params, unitId)
         end
 
         local groupTask = "Ground Attack"
-        if unitType == "KC-135MPRS" or unitType == "KC-135" or unitType == "KC-130" then
+        -- Set task to Refueling for tanker types
+        if unitType == "KC-135MPRS" or unitType == "KC-135" or unitType == "KC-130" or unitType == "S-3B" then
             groupTask = "Refueling"
+        -- Set task to AWACS for AWACS types
+        elseif unitType == "E-2C" or unitType == "E-3A" or unitType == "A-50" then
+            groupTask = "AWACS"
         end
         
         local newGroup = { name = groupName, task = groupTask, units = unitsTable }
@@ -508,8 +585,14 @@ function markspawn.eventHandler(event)
     
     -- Player enter unit - setup menu
     if event.id == 15 then -- S_EVENT_PLAYER_ENTER_UNIT
+        -- Use event.initiator if available, otherwise fall back to getting the unit by ID
         local unit = event.initiator
-        if unit and unit:getPlayerName() then
+        if not unit and event.unitID then
+            unit = Unit.getByID(event.unitID)
+        end
+        
+        -- Check if unit exists and has getPlayerName method before calling it
+        if unit and unit.getPlayerName and unit:getPlayerName() then
             timer.scheduleFunction(function()
                 markspawn.setupPlayerMenu(unit)
             end, nil, timer.getTime() + 2)
@@ -526,4 +609,4 @@ world.addEventHandler(MarkSpawnEventHandler)
 
 markspawn.loadDatabase()
 markspawn.log("GVAW MarkSpawn - Universal Spawning Script Initialized.")
-env.info("GVAW Markspawn v3 - rev 3.0.3 initialized.")
+env.info("GVAW Markspawn v3 - rev 3.0.6 initialized.")
