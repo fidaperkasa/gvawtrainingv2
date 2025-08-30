@@ -2,9 +2,12 @@
 --
 -- GVAW MarkSpawn Enhanced - Universal Spawning Script for DCS World
 -- By EagleEye - DCS Indonesia
--- Version 3.0.6
+-- Version 3.0.7
 -- --- Expansion modification AWACS and TANKER default
 -- --- FIX error for several things
+-- --- Enhanced with selective deletion functionality and individual group deletion
+-- --- Enhanced JTAC functionality with FAC tasking
+-- --- Enhanced with Embarking system for Troops to Transport
 --
 -- =================================================================================================
 
@@ -15,8 +18,9 @@ markspawn.debug = true
 markspawn.commandIdent = "spawn"
 markspawn.dbFileName = "dbspawn.json"
 
--- Runtime Data
-markspawn.spawnedGroups = {} -- Tracks all spawned groups by name
+-- Runtime Data - Enhanced tracking
+markspawn.spawnedGroups = {} -- Tracks all spawned groups with metadata
+markspawn.spawnedStatics = {} -- Tracks static objects
 
 -- Load external libraries
 JSON = dofile(lfs.writedir() .. [[Scripts\GVAWv2\json.lua]])
@@ -55,6 +59,48 @@ function markspawn.getMessageParameters(message)
     return params
 end
 
+-- static template spawn
+-- Map template unit names to actual DCS unit types
+function markspawn.getActualUnitType(templateUnitName)
+    local unitMap = {
+        ["FARP Command Post"] = "FARP CP Blindage",
+        ["FARP Fuel Depot"] = "FARP Fuel Depot", 
+        ["FARP Ammo Dump Coating"] = "FARP Ammo Dump Coating",
+        ["FARP Tent"] = "FARP Tent",
+        -- Add other mappings as needed
+    }
+    
+    return unitMap[templateUnitName] or templateUnitName
+end
+
+function markspawn.isStaticObject(unitTypeName)
+    -- Common static object patterns
+    local staticPatterns = {
+        "FARP", "Tent", "Depot", "Dump", "Command", "Post", "Fuel", "Ammo", 
+        "Barracks", "Hangar", "Warehouse", "Shelter", "Tower", "Container"
+    }
+    
+    -- Check if unit type name contains any static pattern
+    unitTypeName = unitTypeName:lower()
+    for _, pattern in ipairs(staticPatterns) do
+        if unitTypeName:find(pattern:lower()) then
+            return true
+        end
+    end
+    
+    -- Also check against the database STATIC category
+    if markspawn.unitDatabase and markspawn.unitDatabase.STATIC then
+        for _, staticName in ipairs(markspawn.unitDatabase.STATIC) do
+            if staticName:lower() == unitTypeName then
+                return true
+            end
+        end
+    end
+    
+    return false
+end
+
+
 -- Sends message to a specific unit if unitId is provided.
 function markspawn.notify(message, timeout, unitId)
     timeout = timeout or 10
@@ -88,7 +134,7 @@ end
 markspawn.callsigns = {
     jtac = { axeman = 1, darknight = 2, warrior = 3, pointer = 4, eyeball = 5, moonbeam = 6, whiplash = 7, finger = 8, pinpoint = 9, ferret = 10, shaba = 11, playboy = 12, hammer = 13, jaguar = 14, deathstar = 15, anvil = 16, firefly = 17, mantis = 18, badger = 19 },
     tanker = { texaco = 1, arco = 2, shell = 3 },
-    awacs = { overlord = 1, magic = 2, wizard = 3, focus = 4, darkstar = 5 }, -- AWACS callsigns
+    awacs = { overlord = 1, magic = 2, wizard = 3, focus = 4, darkstar = 5 },
     aircraft = { enfield = 1, springfield = 2, uzi = 3, colt = 4, dodge = 5, ford = 6, chevy = 7, pontiac = 8 }
 }
 
@@ -151,16 +197,253 @@ function markspawn.cmdDeleteAll(params)
     markspawn.notify("Deleting all spawned units...", 10, uid)
 
     -- Delete everything we know about
-    for _, g in ipairs(markspawn.spawnedGroups or {}) do
-        local grp = Group.getByName(g.name)
+    for _, group in ipairs(markspawn.spawnedGroups or {}) do
+        local grp = Group.getByName(group.name)
         if grp and grp:isExist() then
             grp:destroy()
         end
     end
+    
+    for _, static in ipairs(markspawn.spawnedStatics or {}) do
+        local staticObj = StaticObject.getByName(static.name)
+        if staticObj and staticObj:isExist() then
+            staticObj:destroy()
+        end
+    end
 
-    -- Reset tracker
+    -- Reset trackers
     markspawn.spawnedGroups = {}
+    markspawn.spawnedStatics = {}
     markspawn.notify("All spawned units and templates deleted.", 10, uid)
+end
+
+-- Delete by unit type
+function markspawn.cmdDeleteByType(params)
+    local uid = params.uid
+    local unitType = params.unitType
+    
+    if not unitType then
+        markspawn.notify("Error: Please specify unit type to delete", 10, uid)
+        return
+    end
+    
+    local deletedCount = 0
+    
+    -- Delete groups of this type
+    for i = #markspawn.spawnedGroups, 1, -1 do
+        local group = markspawn.spawnedGroups[i]
+        if group.unitType == unitType or group.templateName == unitType then
+            local grp = Group.getByName(group.name)
+            if grp and grp:isExist() then
+                grp:destroy()
+                table.remove(markspawn.spawnedGroups, i)
+                deletedCount = deletedCount + 1
+            end
+        end
+    end
+    
+    -- Delete statics of this type
+    for i = #markspawn.spawnedStatics, 1, -1 do
+        local static = markspawn.spawnedStatics[i]
+        if static.type == unitType then
+            local staticObj = StaticObject.getByName(static.name)
+            if staticObj and staticObj:isExist() then
+                staticObj:destroy()
+                table.remove(markspawn.spawnedStatics, i)
+                deletedCount = deletedCount + 1
+            end
+        end
+    end
+    
+    markspawn.notify("Deleted " .. deletedCount .. " objects of type: " .. unitType, 10, uid)
+end
+
+-- Delete templates only
+function markspawn.cmdDeleteTemplates(params)
+    local uid = params.uid
+    local deletedCount = 0
+    
+    for i = #markspawn.spawnedGroups, 1, -1 do
+        local group = markspawn.spawnedGroups[i]
+        if group.isTemplate then
+            local grp = Group.getByName(group.name)
+            if grp and grp:isExist() then
+                grp:destroy()
+                table.remove(markspawn.spawnedGroups, i)
+                deletedCount = deletedCount + 1
+            end
+        end
+    end
+    
+    markspawn.notify("Deleted " .. deletedCount .. " template groups", 10, uid)
+end
+
+-- Delete single units only
+function markspawn.cmdDeleteSingleUnits(params)
+    local uid = params.uid
+    local deletedCount = 0
+    
+    for i = #markspawn.spawnedGroups, 1, -1 do
+        local group = markspawn.spawnedGroups[i]
+        if not group.isTemplate then
+            local grp = Group.getByName(group.name)
+            if grp and grp:isExist() then
+                grp:destroy()
+                table.remove(markspawn.spawnedGroups, i)
+                deletedCount = deletedCount + 1
+            end
+        end
+    end
+    
+    -- Also delete statics (they're always single units)
+    for i = #markspawn.spawnedStatics, 1, -1 do
+        local static = markspawn.spawnedStatics[i]
+        local staticObj = StaticObject.getByName(static.name)
+        if staticObj and staticObj:isExist() then
+            staticObj:destroy()
+            table.remove(markspawn.spawnedStatics, i)
+            deletedCount = deletedCount + 1
+        end
+    end
+    
+    markspawn.notify("Deleted " .. deletedCount .. " single units and statics", 10, uid)
+end
+
+-- Delete specific group by name
+function markspawn.cmdDeleteSpecificGroup(params)
+    local uid = params.uid
+    local groupName = params.groupName
+    
+    if not groupName then
+        markspawn.notify("Error: Please specify group name to delete", 10, uid)
+        return
+    end
+    
+    local deleted = false
+    
+    -- Search through groups
+    for i = #markspawn.spawnedGroups, 1, -1 do
+        local group = markspawn.spawnedGroups[i]
+        if group.name == groupName then
+            local grp = Group.getByName(groupName)
+            if grp and grp:isExist() then
+                grp:destroy()
+                table.remove(markspawn.spawnedGroups, i)
+                markspawn.notify("Deleted group: " .. groupName, 10, uid)
+                deleted = true
+                break
+            end
+        end
+    end
+    
+    -- Search through statics
+    if not deleted then
+        for i = #markspawn.spawnedStatics, 1, -1 do
+            local static = markspawn.spawnedStatics[i]
+            if static.name == groupName then
+                local staticObj = StaticObject.getByName(groupName)
+                if staticObj and staticObj:isExist() then
+                    staticObj:destroy()
+                    table.remove(markspawn.spawnedStatics, i)
+                    markspawn.notify("Deleted static: " .. groupName, 10, uid)
+                    deleted = true
+                    break
+                end
+            end
+        end
+    end
+    
+    if not deleted then
+        markspawn.notify("Group not found: " .. groupName, 10, uid)
+    end
+end
+
+-- Embarking troops
+function markspawn.cmdAssignTransport(params)
+    local uid = params.uid
+    markspawn.notify("Transport assignment feature coming soon!\nUse DCS built-in transport commands for now.", 15, uid)
+end
+
+
+-- List spawned objects
+function markspawn.cmdListSpawned(params)
+    local uid = params.uid
+    local msg = "-- Currently Spawned --\n"
+    
+    local templateCount = 0
+    local unitCount = 0
+    local staticCount = #markspawn.spawnedStatics
+    
+    for _, group in ipairs(markspawn.spawnedGroups) do
+        if group.isTemplate then
+            templateCount = templateCount + 1
+        else
+            unitCount = unitCount + 1
+        end
+    end
+    
+    msg = msg .. "Templates: " .. templateCount .. "\n"
+    msg = msg .. "Single Units: " .. unitCount .. "\n"
+    msg = msg .. "Static Objects: " .. staticCount .. "\n"
+    msg = msg .. "Total: " .. (templateCount + unitCount + staticCount)
+    
+    markspawn.notify(msg, 15, uid)
+end
+
+-- List all groups with details
+function markspawn.cmdListAllGroups(params)
+    local uid = params.uid
+    local page = params.page or 1
+    
+    if #markspawn.spawnedGroups == 0 and #markspawn.spawnedStatics == 0 then
+        markspawn.notify("No spawned groups found.", 10, uid)
+        return
+    end
+    
+    local allItems = {}
+    
+    -- Add groups
+    for _, group in ipairs(markspawn.spawnedGroups) do
+        local itemType = group.isTemplate and "TEMPLATE" or "UNIT"
+        table.insert(allItems, {
+            name = group.name,
+            display = group.displayName .. " (" .. itemType .. ")",
+            type = "group"
+        })
+    end
+    
+    -- Add statics
+    for _, static in ipairs(markspawn.spawnedStatics) do
+        table.insert(allItems, {
+            name = static.name,
+            display = static.type .. " (STATIC)",
+            type = "static"
+        })
+    end
+    
+    -- Pagination
+    local chunkSize = 15
+    local startIndex = (page - 1) * chunkSize + 1
+    local endIndex = math.min(startIndex + chunkSize - 1, #allItems)
+    
+    if startIndex > #allItems then
+        markspawn.notify("No more groups to display.", 10, uid)
+        return
+    end
+    
+    local msg = string.format("-- Spawned Groups Page %d --\n", page)
+    for i = startIndex, endIndex do
+        local item = allItems[i]
+        msg = msg .. string.format("%d. %s\n", i, item.display)
+    end
+    
+    if endIndex < #allItems then
+        msg = msg .. string.format("\n... %d more groups", #allItems - endIndex)
+    end
+    
+    msg = msg .. "\n\nUse: /spawn delete,group=GROUP_NAME to delete specific group"
+    
+    markspawn.notify(msg, 30, uid)
 end
 
 -- Show command syntax
@@ -173,6 +456,13 @@ function markspawn.cmdShowSyntax(params)
 
     Single/Multi-Unit Spawn:
     spawn,type=UNIT,amount=N,country=C,hdg=DEG,alt=FT,spd=KTS
+
+    JTAC Special:
+    spawn,type=JTAC,country=C,freq=FREQ,laser=CODE,marktype=TYPE
+    (marktype: all, laser, smoke, infrared)
+
+    Delete Specific Group:
+    spawn delete,group=GROUP_NAME
     ]]
     markspawn.notify(helpText, 45, uid)
 end
@@ -299,14 +589,227 @@ function markspawn.setupPlayerMenu(unit)
         end
     end
 
-    -- Clean up
-    missionCommands.addCommandForGroup(groupId, "Delete All Spawned Units", root, markspawn.cmdDeleteAll, { uid = uid })
+     -- Transport assignment menu
+    local transportMenu = missionCommands.addSubMenuForGroup(groupId, "Transport Assignment", cleanupMenu)
+    
+    missionCommands.addCommandForGroup(groupId, "List Available Infantry", transportMenu, markspawn.cmdAssignTransport, { uid = uid })
+    
+    -- Add menu items for each available infantry group
+    if markspawn.embarkableGroups and #markspawn.embarkableGroups > 0 then
+        for i, infantry in ipairs(markspawn.embarkableGroups) do
+            missionCommands.addCommandForGroup(groupId, 
+                "Transport " .. infantry.groupName, 
+                transportMenu, 
+                markspawn.cmdAssignTransportToList, 
+                { uid = uid, infantryIndex = i }
+            )
+        end
+    end
+    -- Enhanced cleanup menu
+    local cleanupMenu = missionCommands.addSubMenuForGroup(groupId, "Selective Cleanup", root)
+
+    -- List spawned objects
+    missionCommands.addCommandForGroup(groupId, "List Spawned Objects", cleanupMenu, markspawn.cmdListSpawned, { uid = uid })
+    missionCommands.addCommandForGroup(groupId, "List All Groups", cleanupMenu, markspawn.cmdListAllGroups, { uid = uid })
+
+    -- Existing delete all
+    missionCommands.addCommandForGroup(groupId, "Delete ALL Spawned Units", cleanupMenu, markspawn.cmdDeleteAll, { uid = uid })
+
+    -- New selective options
+    missionCommands.addCommandForGroup(groupId, "Delete Templates Only", cleanupMenu, markspawn.cmdDeleteTemplates, { uid = uid })
+    missionCommands.addCommandForGroup(groupId, "Delete Single Units Only", cleanupMenu, markspawn.cmdDeleteSingleUnits, { uid = uid })
+
+    -- Delete by type submenu
+    local deleteByTypeMenu = missionCommands.addSubMenuForGroup(groupId, "Delete by Unit Type", cleanupMenu)
+
+    -- Add common unit types to the menu
+    local commonTypes = {"E-2C", "E-3A", "A-50", "KC-135", "KC-135MPRS", "KC-130", "S-3B", "JTAC"}
+    for _, unitType in ipairs(commonTypes) do
+        missionCommands.addCommandForGroup(groupId, "Delete " .. unitType, deleteByTypeMenu, 
+            markspawn.cmdDeleteByType, { uid = uid, unitType = unitType })
+    end
+    
+    -- Individual deletion info
+    missionCommands.addCommandForGroup(groupId, "Delete Specific Group...", cleanupMenu, function()
+        markspawn.notify("Use text command on Mark Label:\n 'spawn delete,group=GROUP_NAME'\nexample: spawn delete,group=US_Infantry_5212", 15, uid)
+    end, { uid = uid })
 end
 
 ---------------------------------------------------------------------------------------------------
 -- Unit Tasking & Setup Functions
 ---------------------------------------------------------------------------------------------------
 markspawn.tasking = {}
+
+--- Embark infantry
+-- Enhanced infantry embarkation setup
+function markspawn.setupInfantryEmbarkation(group, controller, params, unitId)
+    local groupName = group:getName()
+    local groupId = group:getID()
+    local groupPos = group:getUnit(1):getPoint()
+    
+    -- List of infantry unit types that should be embarkable
+    local infantryTypes = {
+        "Soldier AK", "Soldier M249", "Soldier M4 GRG", "Soldier M4", 
+        "Soldier RPG", "Soldier stinger", "Infantry AK Ins", "Infantry AK ver2", 
+        "Infantry AK ver3", "Infantry AK", "Paratrooper"
+    }
+    
+    -- Set embarkation task for each individual infantry unit in the group
+    local units = group:getUnits()
+    if units then
+        for i, unit in ipairs(units) do
+            if unit and unit:isExist() then
+                local unitType = unit:getTypeName()
+                
+                -- Check if this unit type is in our infantry list
+                local isInfantryUnit = false
+                for _, infantryType in ipairs(infantryTypes) do
+                    if unitType == infantryType then
+                        isInfantryUnit = true
+                        break
+                    end
+                end
+                
+                if isInfantryUnit then
+                    local unitController = unit:getController()
+                    if unitController then
+                        local embarkTask = {
+                            id = 'EmbarkToTransport',
+                            params = {
+                                zoneRadius = 1500,
+                                x = groupPos.x,
+                                y = groupPos.z
+                            }
+                        }
+                        unitController:setTask(embarkTask)
+                    end
+                end
+            end
+        end
+    end
+    
+    -- Store infantry group info for tracking
+    if not markspawn.embarkableGroups then
+        markspawn.embarkableGroups = {}
+    end
+    table.insert(markspawn.embarkableGroups, {
+        groupId = groupId,
+        groupName = groupName,
+        position = groupPos,
+        spawnTime = timer.getTime(),
+        radius = 1500
+    })
+    
+    markspawn.notify("Infantry group " .. groupName .. " ready for embarkation\nEmbark radius: 1500m from spawn position\nUse F7 menu to assign transport", 15, unitId)
+end
+
+-- Function to assign transport to infantry
+function markspawn.cmdAssignTransport(params)
+    local uid = params.uid
+    
+    if not markspawn.embarkableGroups or #markspawn.embarkableGroups == 0 then
+        markspawn.notify("No infantry groups available for transport assignment.", 10, uid)
+        return
+    end
+    
+    -- For now, just show available infantry groups
+    local msg = "Available infantry groups for transport:\n"
+    for i, infantry in ipairs(markspawn.embarkableGroups) do
+        msg = msg .. string.format("%d. %s (ID: %d)\n", i, infantry.groupName, infantry.groupId)
+    end
+    msg = msg .. "\nUse DCS F10 menu: F10 -> Other -> Assign Transport to Group"
+    
+    markspawn.notify(msg, 20, uid)
+end
+
+-- Function to create transport task for helicopters
+function markspawn.createTransportTask(helicopterGroup, infantryGroupId, destination)
+    local controller = helicopterGroup:getController()
+    if not controller then return false end
+    
+    local infantryGroup = Group.getByID(infantryGroupId)
+    if not infantryGroup or not infantryGroup:isExist() then return false end
+    
+    local infantryPos = infantryGroup:getUnit(1):getPoint()
+    local destPos = destination or infantryPos  -- Default to pickup location if no destination
+    
+    local transportTask = {
+        id = 'Embarking',
+        params = {
+            x = infantryPos.x,
+            y = infantryPos.z,
+            groupsForEmbarking = { infantryGroupId },
+            duration = 300,  -- 5 minutes wait time
+            distributionFlag = false
+        }
+    }
+    
+    controller:setTask(transportTask)
+    return true
+end
+
+-- Enhanced transport assignment command with list of infantry groups
+function markspawn.cmdAssignTransportToList(params)
+    local uid = params.uid
+    local infantryIndex = params.infantryIndex
+    
+    if not markspawn.embarkableGroups or not markspawn.embarkableGroups[infantryIndex] then
+        markspawn.notify("Invalid infantry group selection.", 10, uid)
+        return
+    end
+    
+    local infantry = markspawn.embarkableGroups[infantryIndex]
+    local playerUnit = Unit.getByName(Unit.getID(uid))
+    
+    if not playerUnit then
+        markspawn.notify("Player unit not found.", 10, uid)
+        return
+    end
+    
+    local playerGroup = playerUnit:getGroup()
+    if not playerGroup then
+        markspawn.notify("Player group not found.", 10, uid)
+        return
+    end
+    
+    if markspawn.createTransportTask(playerGroup, infantry.groupId, infantry.position) then
+        markspawn.notify("Transport task assigned for infantry: " .. infantry.groupName, 15, uid)
+        table.remove(markspawn.embarkableGroups, infantryIndex)
+    else
+        markspawn.notify("Failed to assign transport task.", 10, uid)
+    end
+end
+
+
+--- JTAC
+function markspawn.setupJTAC(group, controller, params, unitId)
+    local groupName = group:getName()
+    
+    -- Set laser code (default 1688 or custom)
+    local laserCode = tonumber(params.laser) or 1688
+    
+    -- Set radio frequency if provided (default to 30.0 MHz if not specified)
+    local frequency = tonumber(params.freq) or 30.0
+    
+    -- Create FAC task for JTAC
+    local jtacTask = {
+        id = 'FAC',  -- Corrected to uppercase 'FAC'
+        params = {
+            frequency = frequency * 1000000,  -- Convert MHz to Hz
+            modulation = 0,  -- 0 = AM, 1 = FM
+            laserCode = laserCode
+        }
+    }
+    
+    controller:setTask(jtacTask)
+    
+    markspawn.notify("JTAC " .. groupName .. " activated as FAC\nFrequency: " .. frequency .. " MHz AM\nLaser Code: " .. laserCode, 15, unitId)
+end
+
+function markspawn.setJTACMarkingType(controller, markType)
+    -- This function is no longer needed as marking is handled by DCS FAC task
+    return
+end
 
 function markspawn.postSpawnSetup(groupName, spawnLocation, params, unitId)
     local newGroup = Group.getByName(groupName)
@@ -321,6 +824,90 @@ function markspawn.postSpawnSetup(groupName, spawnLocation, params, unitId)
             controller:setCommand({id = 'SetFrequency', params = {frequency = tonumber(params.freq) * 1000000, modulation = 0}})
             markspawn.notify(groupName .. " radio set to " .. params.freq .. " MHz AM.", 10, unitId)
         end
+    end
+
+    -- JTAC specific setup
+    if unitType == "JTAC" then
+        markspawn.setupJTAC(newGroup, controller, params, unitId)
+        return
+    end
+
+    -- Infantry specific setup - auto embarkation readiness
+    local isInfantry = false
+    local infantryTypes = {
+        "Soldier AK", "Soldier M249", "Soldier M4 GRG", "Soldier M4", 
+        "Soldier RPG", "Soldier stinger", "Infantry AK Ins", "Infantry AK ver2", 
+        "Infantry AK ver3", "Infantry AK", "Paratrooper", "Marine", "Special Forces"
+    }
+    
+    -- Check if unit type is in our infantry list
+    if unitType then
+        for _, infantryType in ipairs(infantryTypes) do
+            if unitType == infantryType then
+                isInfantry = true
+                break
+            end
+        end
+    end
+
+    -- Template specific setup - check if template contains any infantry units
+    if params.temp then
+        local templateData = markspawn.unitDatabase.TEMPLATES[params.temp]
+        if templateData then
+            for _, unitT in pairs(templateData.units) do
+                for _, infantryType in ipairs(infantryTypes) do
+                    if unitT.name == infantryType then
+                        isInfantry = true
+                        break
+                    end
+                end
+                if isInfantry then break end
+            end
+        end
+    end
+
+    if isInfantry then
+        markspawn.setupInfantryEmbarkation(newGroup, controller, params, unitId)
+        return
+    end
+    
+    -- Check if unit type indicates infantry
+    if unitType and (unitType:lower():find("infantry") or unitType:lower():find("soldier") or 
+        unitType:lower():find("rifle") or unitType:lower():find("machinegun") or 
+        unitType:lower():find("at") or unitType:lower():find("aa") or
+        unitType:lower():find("mortar") or unitType:lower():find("sniper")) then
+        isInfantry = true
+    end
+
+    -- Template specific setup - check if template name contains "infantry"
+    if params.temp then
+        local templateName = params.temp:lower()
+        if templateName:find("infantry") or templateName:find("soldier") or 
+           templateName:find("rifle") or templateName:find("squad") or
+           templateName:find("platoon") or templateName:find("company") then
+            isInfantry = true
+        else
+            -- Also check individual units in the template
+            local templateData = markspawn.unitDatabase.TEMPLATES[params.temp]
+            if templateData then
+                for _, unitT in pairs(templateData.units) do
+                    if unitT.name and (unitT.name:lower():find("infantry") or unitT.name:lower():find("soldier") or 
+                       unitT.name:lower():find("rifle") or unitT.name:lower():find("machinegun") or 
+                       unitT.name:lower():find("at") or unitT.name:lower():find("aa") or
+                       unitT.name:lower():find("mortar") or unitT.name:lower():find("sniper")) then
+                        isInfantry = true
+                        break
+                    end
+                end
+            end
+        end
+    end
+
+    -- REMOVED THE EXTRA TWO 'end' STATEMENTS HERE
+
+    if isInfantry then
+        markspawn.setupInfantryEmbarkation(newGroup, controller, params, unitId)
+        return
     end
 
     if params.category == Group.Category.AIRPLANE or params.category == Group.Category.HELICOPTER then
@@ -415,10 +1002,9 @@ function markspawn.spawner.spawnTemplate(location, params, unitId)
         countryID = country.id.CJTF_RED
     end
 
-    local groupCategory = Group.Category.GROUND
     local baseHeadingRad = math.rad(tonumber(params.hdg) or 0)
-
-    local unitsTable = {}
+    
+    -- Spawn each unit individually
     for _, unitT in pairs(templateData.units) do
         local unitHeadingRad = baseHeadingRad + math.rad(unitT.heading or 0)
         if unitHeadingRad > (2 * math.pi) then unitHeadingRad = unitHeadingRad - (2 * math.pi) end
@@ -427,30 +1013,62 @@ function markspawn.spawner.spawnTemplate(location, params, unitId)
         local unitX = location.x + ((unitT.dx or 0) * math.cos(baseHeadingRad) - (unitT.dy or 0) * math.sin(baseHeadingRad))
         local unitZ = location.z + ((unitT.dx or 0) * math.sin(baseHeadingRad) + (unitT.dy or 0) * math.cos(baseHeadingRad))
         
-        local unitData = {
-            name = unitT.name .. "_" .. math.random(100,999),
-            type = unitT.name,
-            x = unitX,
-            y = unitZ,
-            heading = unitHeadingRad,
-            skill = unitT.skill or "Average"
-        }
-        table.insert(unitsTable, unitData)
+        local actualUnitType = markspawn.getActualUnitType(unitT.name)
+        local isStatic = markspawn.isStaticObject(actualUnitType)
+        
+        if isStatic then
+            -- Spawn as static object
+            local staticName = actualUnitType .. "_" .. math.random(1000, 9999)
+            local newStatic = {
+                type = actualUnitType,
+                name = staticName,
+                x = unitX,
+                y = unitZ,
+                heading = unitHeadingRad
+            }
+            if coalition.addStaticObject(countryID, newStatic) then
+                table.insert(markspawn.spawnedStatics, {
+                    name = staticName,
+                    type = actualUnitType,
+                    spawnTime = timer.getTime(),
+                    spawnedBy = unitId
+                })
+            end
+        else
+            -- Spawn as single unit group (for now)
+            local unitName = actualUnitType .. "_" .. math.random(1000, 9999)
+            local unitData = {
+                type = actualUnitType,
+                name = unitName,
+                x = unitX,
+                y = unitZ,
+                heading = unitHeadingRad,
+                skill = unitT.skill or "Average"
+            }
+            
+            local groupName = unitName
+            local newGroup = { name = groupName, task = "Ground Attack", units = {unitData} }
+            
+            local result = coalition.addGroup(countryID, Group.Category.GROUND, newGroup)
+            if result then
+                table.insert(markspawn.spawnedGroups, {
+                    name = result:getName(),
+                    displayName = actualUnitType,
+                    unitType = actualUnitType,
+                    isTemplate = false,
+                    spawnTime = timer.getTime(),
+                    spawnedBy = unitId,
+                    units = 1
+                })
+            end
+        end
     end
-
-    local groupName = templateName .. "_" .. math.random(1000, 9999)
-    local newGroup = { name = groupName, task = "Ground Attack", units = unitsTable }
     
-    local result = coalition.addGroup(countryID, groupCategory, newGroup)
-    if result then
-        local actualGroupName = result:getName()
-        markspawn.notify("Spawned template: " .. actualGroupName, 10, unitId)
-        table.insert(markspawn.spawnedGroups, { name = actualGroupName, isTemplate = true })
-    else
-        markspawn.notify("Failed to spawn template: " .. templateName, 10, unitId)
-    end
+    markspawn.notify("Spawned template: " .. templateName, 10, unitId)
 end
 
+-- Helper function to check if a unit type is a static object
+-- Enhanced static object detection
 function markspawn.spawner.spawnObject(location, params, unitId)
     if params.temp then
         markspawn.spawner.spawnTemplate(location, params, unitId)
@@ -469,7 +1087,17 @@ function markspawn.spawner.spawnObject(location, params, unitId)
     
     if unitCategory == "STATIC" then
         local newStatic = { type = unitType, name = unitType .. "_" .. math.random(1000, 9999), x = location.x, y = location.z, heading = headingRad }
-        if coalition.addStaticObject(countryID, newStatic) then markspawn.notify("Spawned static object: " .. unitType, 10, unitId) else markspawn.notify("Failed to spawn static object: " .. unitType, 10, unitId) end
+        if coalition.addStaticObject(countryID, newStatic) then
+            markspawn.notify("Spawned static object: " .. unitType, 10, unitId)
+            table.insert(markspawn.spawnedStatics, {
+                name = newStatic.name,
+                type = unitType,
+                spawnTime = timer.getTime(),
+                spawnedBy = unitId
+            })
+        else
+            markspawn.notify("Failed to spawn static object: " .. unitType, 10, unitId)
+        end
     else
         local groupName = unitType .. "_" .. math.random(1000, 9999)
         local callsignTable
@@ -542,6 +1170,9 @@ function markspawn.spawner.spawnObject(location, params, unitId)
         -- Set task to AWACS for AWACS types
         elseif unitType == "E-2C" or unitType == "E-3A" or unitType == "A-50" then
             groupTask = "AWACS"
+        -- Set task to FAC for JTAC
+        elseif unitType == "JTAC" then
+            groupTask = "FAC"
         end
         
         local newGroup = { name = groupName, task = groupTask, units = unitsTable }
@@ -553,7 +1184,16 @@ function markspawn.spawner.spawnObject(location, params, unitId)
         if result then
             local actualGroupName = result:getName()
             markspawn.notify("Spawned group: " .. actualGroupName .. " with " .. amount .. " unit(s).", 10, unitId)
-            table.insert(markspawn.spawnedGroups, {name = actualGroupName})
+            table.insert(markspawn.spawnedGroups, {
+                name = actualGroupName,
+                displayName = groupName,
+                unitType = unitType,
+                isTemplate = false,
+                spawnTime = timer.getTime(),
+                spawnedBy = unitId,
+                category = unitCategory,
+                units = amount
+            })
             
             params.category = unitCategory
             
@@ -574,6 +1214,21 @@ function markspawn.eventHandler(event)
         if not initiatorUnit then return end
         local initiatorUnitId = initiatorUnit:getID()
 
+        -- Check for delete command
+        if event.text:lower():startsWith("spawn delete,") then
+            local _, _, params_str = event.text:find("spawn delete,(.+)")
+            if params_str then
+                local params = markspawn.getMessageParameters(params_str)
+                if params.group then
+                    markspawn.cmdDeleteSpecificGroup({uid = initiatorUnitId, groupName = params.group})
+                else
+                    markspawn.notify("Usage: spawn delete,group=GROUP_NAME", 10, initiatorUnitId)
+                end
+            end
+            return
+        end
+
+        -- Original spawn command
         local command, _, params_str = event.text:find("spawn,(.+)")
         if params_str then
             local params = markspawn.getMessageParameters(params_str)
@@ -609,4 +1264,4 @@ world.addEventHandler(MarkSpawnEventHandler)
 
 markspawn.loadDatabase()
 markspawn.log("GVAW MarkSpawn - Universal Spawning Script Initialized.")
-env.info("GVAW Markspawn v3 - rev 3.0.6 initialized.")
+env.info("GVAW Markspawn v3 - rev 3.0.7 initialized.")
