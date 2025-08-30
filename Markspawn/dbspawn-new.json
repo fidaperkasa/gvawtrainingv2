@@ -371,6 +371,77 @@
         { "dx": -25, "dy": 35, "name": "Infantry AK ver2", "skill": "Average", "heading": 90 }
       ]
     },
+    "Infantry_Group":{
+      "units":[
+        { "dx": 0, "dy": 0, "name": "Infantry AK ver2", "skill": "High", "heading": 0 },
+        { "dx": 30, "dy": 15, "name": "Infantry AK ver2", "skill": "High", "heading": 45 },
+        { "dx": 40, "dy": -10, "name": "Infantry AK ver2", "skill": "Average", "heading": 230 },
+        { "dx": -15, "dy": 35, "name": "Infantry AK ver2", "skill": "Average", "heading": 60 },
+        { "dx": -25, "dy": 35, "name": "Infantry AK ver2", "skill": "Average", "heading": 50 },
+        { "dx": 10, "dy": 55, "name": "Infantry AK ver2", "skill": "High", "heading": 45 },
+        { "dx": 20, "dy": -70, "name": "Infantry AK ver2", "skill": "Average", "heading": 270 },
+        { "dx": -75, "dy": 55, "name": "Infantry AK ver2", "skill": "Average", "heading": 190 },
+        { "dx": -65, "dy": 13, "name": "Infantry AK ver2", "skill": "Average", "heading": 140 }
+      ]
+    },
+    "US_Infantry":{
+      "units":[
+        { "dx": 0, "dy": 0, "name": "Soldier M4 GRG", "skill": "High", "heading": 0 },
+        { "dx": 30, "dy": 15, "name": "Soldier M4 GRG", "skill": "High", "heading": 45 },
+        { "dx": 40, "dy": -10, "name": "Soldier M4 GRG", "skill": "Average", "heading": 230 },
+        { "dx": -15, "dy": 35, "name": "Soldier M4 GRG", "skill": "Average", "heading": 60 },
+        { "dx": -25, "dy": 35, "name": "Soldier M4 GRG", "skill": "Average", "heading": 50 },
+        { "dx": 10, "dy": 55, "name": "Soldier M4 GRG", "skill": "High", "heading": 45 },
+        { "dx": 20, "dy": -70, "name": "Soldier M4 GRG", "skill": "Average", "heading": 270 },
+        { "dx": -75, "dy": 55, "name": "Soldier M4 GRG", "skill": "Average", "heading": 190 },
+        { "dx": -65, "dy": 13, "name": "Soldier M4 GRG", "skill": "Average", "heading": 140 }
+      ]
+    },    
+    "Insurgent":{
+      "units":[
+        { "dx": 0, "dy": 0, "name": "Infantry AK Ins", "skill": "High", "heading": 0 },
+        { "dx": 30, "dy": 15, "name": "Infantry AK Ins", "skill": "High", "heading": 45 },
+        { "dx": 40, "dy": -10, "name": "Infantry AK Ins", "skill": "Average", "heading": 230 },
+        { "dx": -15, "dy": 35, "name": "Infantry AK Ins", "skill": "Average", "heading": 60 },
+        { "dx": -25, "dy": 35, "name": "Infantry AK Ins", "skill": "Average", "heading": 50 },
+        { "dx": 10, "dy": 55, "name": "Infantry AK Ins", "skill": "High", "heading": 45 },
+        { "dx": 20, "dy": -70, "name": "Infantry AK Ins", "skill": "Average", "heading": 270 },
+        { "dx": -75, "dy": 55, "name": "Infantry AK Ins", "skill": "Average", "heading": 190 },
+        { "dx": -65, "dy": 13, "name": "Infantry AK Ins", "skill": "Average", "heading": 140 }
+      ]
+    },
+    "US_MANPADS":{
+      "units":[
+        { "dx": 0, "dy": 0, "name": "Soldier stinger", "skill": "High", "heading": 0 },
+        { "dx": 30, "dy": 15, "name": "Stinger comm", "skill": "High", "heading": 45 },
+        { "dx": -65, "dy": 13, "name": "Soldier stinger", "skill": "Average", "heading": 140 }
+      ]
+    },
+    "RU_MANPADS":{
+      "units":[
+        { "dx": 0, "dy": 0, "name": "SA-18 Igla manpad", "skill": "High", "heading": 0 },
+        { "dx": 30, "dy": 15, "name": "SA-18 Igla manpad", "skill": "High", "heading": 45 },
+        { "dx": -65, "dy": 13, "name": "SA-18 Igla-S comm", "skill": "Average", "heading": 140 }
+      ]
+    },
+    "US_CONVOY": {
+      "units": [
+        { "dx": 0, "dy": 0, "name": "M1043 HMMWV Armament", "skill": "High", "heading": 0 },
+        { "dx": -20, "dy": 10, "name": "M 818", "skill": "High", "heading": 225 },
+        { "dx": -10, "dy": -30, "name": "M 818", "skill": "Good", "heading": 180 },
+        { "dx": 40, "dy": 20, "name": "M 818", "skill": "Good", "heading": 315 },
+        { "dx": 20, "dy": 20, "name": "M-2 Bradley", "skill": "Good", "heading": 315 }
+      ]
+    },
+    "RU_CONVOY": {
+      "units": [
+        { "dx": 0, "dy": 0, "name": "Land_Rover_109_S3", "skill": "High", "heading": 0 },
+        { "dx": -20, "dy": 10, "name": "Ural-375", "skill": "High", "heading": 225 },
+        { "dx": -10, "dy": -30, "name": "Ural-375", "skill": "Good", "heading": 180 },
+        { "dx": 40, "dy": 20, "name": "Ural-375", "skill": "Good", "heading": 315 },
+        { "dx": 20, "dy": 20, "name": "Ural-375 ZU-23", "skill": "Good", "heading": 315 }
+      ]
+    },                            
     "US_SHORAD": {
       "units": [
         { "dx": 0, "dy": 0, "name": "M1097 Avenger", "skill": "High", "heading": 0 },
@@ -379,6 +450,49 @@
         { "dx": 40, "dy": 20, "name": "Soldier M4 GRG", "skill": "Good", "heading": 315 },
         { "dx": 20, "dy": 20, "name": "Soldier M4 GRG", "skill": "Good", "heading": 315 }
       ]
+    },
+    "RU_FARP": {
+      "units": [
+        { "dx": 0, "dy": 0, "name": "FARP Command Post", "skill": "High", "heading": 0 },
+        { "dx": 10, "dy": -10, "name": "FARP Fuel Depot", "skill": "High", "heading": 90 },
+        { "dx": -10, "dy": -10, "name": "FARP Ammo Dump Coating", "skill": "High", "heading": 270 },
+
+        { "dx": 25, "dy": 0, "name": "SKP-11", "skill": "High", "heading": 90 },
+        { "dx": -25, "dy": 0, "name": "Ural-4320 APA-5D", "skill": "Good", "heading": 270 },
+
+        { "dx": 0, "dy": 30, "name": "ATMZ-5", "skill": "Good", "heading": 0 },
+        { "dx": 15, "dy": 30, "name": "ATZ-10", "skill": "Good", "heading": 0 },
+        { "dx": -15, "dy": 30, "name": "Ural-375", "skill": "Good", "heading": 0 },
+
+        { "dx": 30, "dy": -20, "name": "UAZ-469", "skill": "Good", "heading": 180 },
+        { "dx": 40, "dy": -10, "name": "Ural-4320-31", "skill": "Good", "heading": 180 },
+        { "dx": -30, "dy": -20, "name": "Ural-4320T", "skill": "Good", "heading": 180 },
+        { "dx": -40, "dy": -10, "name": "ZIL-131 KUNG", "skill": "Good", "heading": 180 },
+        { "dx": 0, "dy": -40, "name": "KAMAZ Truck", "skill": "Good", "heading": 180 },
+
+        { "dx": 20, "dy": 50, "name": "Infantry AK ver3", "skill": "Average", "heading": 0 },
+        { "dx": -20, "dy": 50, "name": "Infantry AK ver3", "skill": "Average", "heading": 0 },
+        { "dx": 25, "dy": -50, "name": "Infantry AK ver3", "skill": "Average", "heading": 180 },
+        { "dx": -25, "dy": -50, "name": "Infantry AK ver3", "skill": "Average", "heading": 180 }
+      ]
+    },
+    "US_FARP": {
+      "units": [
+        { "dx": 0, "dy": 0, "name": "FARP Command Post", "skill": "High", "heading": 0 },
+        { "dx": 10, "dy": -10, "name": "FARP Fuel Depot", "skill": "High", "heading": 90 },
+        { "dx": -10, "dy": -10, "name": "FARP Ammo Dump Coating", "skill": "High", "heading": 270 },
+
+        { "dx": 25, "dy": 0, "name": "M1025 HMMWV", "skill": "High", "heading": 90 },
+        { "dx": -25, "dy": 0, "name": "M818", "skill": "Good", "heading": 270 },
+
+        { "dx": 0, "dy": 30, "name": "M978 HEMTT Tanker", "skill": "Good", "heading": 0 },
+        { "dx": 20, "dy": 30, "name": "M818", "skill": "Good", "heading": 0 },
+
+        { "dx": 20, "dy": 50, "name": "Soldier M4 GRG", "skill": "Average", "heading": 0 },
+        { "dx": -20, "dy": 50, "name": "Soldier M4 GRG", "skill": "Average", "heading": 0 },
+        { "dx": 25, "dy": -50, "name": "Soldier M4 GRG", "skill": "Average", "heading": 180 },
+        { "dx": -25, "dy": -50, "name": "Soldier M4 GRG", "skill": "Average", "heading": 180 }
+      ]
     }
   },
   "GROUND_UNIT": [
@@ -386,7 +500,8 @@
     "MJ-1_drivable", "P20_drivable", "Predator GCS", "Predator TrojanSpirit", "UAZ-469", "Ural ATsP-6", "Ural-375", 
     "Ural-4320 APA-5D", "Ural-4320-31", "Ural-4320T", "ZIL-131 KUNG", "ZIL-135", "ZIL-4331", "ZiL-131 APA-80", "generator_5i57", "house1arm", 
     "house2arm", "houseA_arm", "outpost", "outpost_road", "outpost_road_l", "outpost_road_r", 
-    "r11_volvo_drivable", 
+    "r11_volvo_drivable", "Infantry AK Ins", "Infantry AK ver2", "Infantry AK ver3", "Infantry AK", "Soldier AK", "Soldier M249", "Soldier M4 GRG",
+    "Soldier M4", "Soldier RPG", "Soldier stinger",
     "AAV7", "BMD-1", "BMP-1", "BMP-2", "BMP-3", "BRDM-2", "BTR-80", "BTR-82A", "BTR_D", 
     "Centaur_IV", "Challenger2", "Gepard", "LAV-25", "Leclerc", 
     "Leopard-2", "Leopard-2A5", "Leopard1A3", "M-1 Abrams", "M-60", "M1126 Stryker ICV", 
